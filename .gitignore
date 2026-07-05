@@ -1,0 +1,15 @@
+# SO
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+
+# Claude Code
+.claude/
+
+# Temporales
+*.log
+*.tmp
+*.bak

@@ -1,0 +1,70 @@
+/* ============================================================
+   Aperture · Semillero de Data Science e IA
+   Estilos globales, animaciones y reglas responsive.
+   ============================================================ */
+
+* { box-sizing: border-box; }
+html, body { margin: 0; overflow-x: hidden; max-width: 100%; }
+img { max-width: 100%; }
+/* La fila de chips ocupa el ancho y envuelve (no se desborda) */
+#heroChips { width: 100%; }
+
+/* ---------- Animaciones ---------- */
+@keyframes blink { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
+@keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+@keyframes popIn { from { opacity:0; transform: translateY(10px);} to { opacity:1; transform: translateY(0);} }
+@keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes glow { 0%,100% { text-shadow:0 0 6px rgba(41,197,214,0.2);} 50% { text-shadow:0 0 14px rgba(41,197,214,0.55);} }
+@keyframes crtOff {
+  0% { transform: scale(1); opacity:1; filter:brightness(1); }
+  50% { transform: scale(1); opacity:1; filter:brightness(1.6); }
+  70% { transform: scaleY(0.015) scaleX(1); opacity:1; filter:brightness(3); }
+  100% { transform: scaleY(0.015) scaleX(0); opacity:0; filter:brightness(3); }
+}
+@keyframes bootSweep { 0% { top:-30%; } 100% { top:130%; } }
+@keyframes bootJitter { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-1px); } 75% { transform: translateX(1px); } }
+@keyframes rowIn { from { opacity:0; transform: translateX(-6px); } to { opacity:1; transform: translateX(0); } }
+@keyframes siteIn { from { filter:brightness(2.6); } to { filter:brightness(1); } }
+@keyframes irisPulse { 0%,100% { transform: scale(1); opacity:0.5; } 50% { transform: scale(1.12); opacity:0.85; } }
+
+/* ---------- Selección y scrollbar ---------- */
+::selection { background: #29c5d6; color: #050a0e; }
+::-webkit-scrollbar { width: 12px; }
+::-webkit-scrollbar-track { background:#050a0e; }
+::-webkit-scrollbar-thumb { background:#157a87; border:2px solid #050a0e; }
+
+/* ---------- Interacciones ---------- */
+.mobtoggle { display:none; }
+.menuitem > button:hover { color:#29c5d6 !important; }
+.bcard:hover { transform:translateX(5px); box-shadow:9px 6px 0 rgba(0,0,0,0.5), 0 0 30px var(--glow) !important; }
+.social:hover { transform:translateY(-3px); box-shadow:4px 8px 0 rgba(0,0,0,0.5), 0 0 18px var(--glow) !important; }
+.alllink:hover { border-color:#4fd6a0 !important; box-shadow:4px 4px 0 #1f6f7c !important; }
+.arcrow:hover { transform:translateX(4px); box-shadow:6px 6px 0 rgba(0,0,0,0.5) !important; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 820px) {
+  .navtabs { display:none !important; width:100%; flex-direction:column !important; align-items:stretch !important; gap:0 !important; border-top:2px solid #157a87; margin-top:10px; }
+  .navtabs.open { display:flex !important; }
+  .navtabs .menuitem { width:100%; }
+  .navtabs .menuitem > button { width:100%; text-align:left !important; padding:13px 6px !important; border-bottom:1px solid #12303c; }
+  .navtabs a.ghbtn { width:100%; text-align:left; margin-top:6px; }
+  .mobtoggle { display:inline-flex !important; }
+}
+@media (max-width: 620px) {
+  /* Las 3 gráficas del lab se apilan: el canvas necesita más alto. */
+  #neuralNet { height: 560px !important; }
+  .bcard-body { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; padding: 16px 18px !important; }
+  .bcard-body > span { flex: 1 1 auto !important; width: 100%; }
+  .bcard-leer { align-self: stretch !important; text-align: center; }
+
+  /* Textos grandes más cómodos en celular y sin desbordar */
+  #heroText { font-size: 19px !important; max-width: 100% !important; }
+  #aboutText { font-size: 19px !important; }
+  #contactText { font-size: 20px !important; }
+  #labPhrase { font-size: 17px !important; }
+}
+/* Pantallas muy pequeñas: menos padding lateral para ganar ancho */
+@media (max-width: 420px) {
+  header { padding-left: 14px !important; padding-right: 14px !important; }
+  #heroText { font-size: 17px !important; }
+}
