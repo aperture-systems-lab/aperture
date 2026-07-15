@@ -16,7 +16,7 @@ COLORES = {
 
 # ── SITIO ─────────────────────────────────────────────────────────────
 TITULO_PESTANA = "Aperture · Semillero de Data Science e IA"
-GITHUB         = "https://github.com/JeroHoyos/aperture"
+GITHUB         = "https://github.com/aperture-systems-lab"
 
 # ── HERO (lo primero que se ve) ───────────────────────────────────────
 # Puedes usar HTML básico: <br> para salto de línea, <span> para color.

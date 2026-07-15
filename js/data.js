@@ -21,7 +21,7 @@ window.APERTURE_DATA = {
     "contactTitle": "CONTACTO",
     "contactText": "¿Te suena? Súmate al semillero o escríbenos por cualquiera de estos canales."
   },
-  "githubUrl": "https://github.com/JeroHoyos/aperture",
+  "githubUrl": "https://github.com/aperture-systems-lab",
   "bootRows": [
     { "label": "SYSTEM", "value": "APERTURE OS v1.0" },
     { "label": "ENFOQUE", "value": "DATA SCIENCE & IA" },
