@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Aperture · Links</title>
+<link rel="icon" type="image/png" href="../assets/aperture-eye-cyan.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; overflow-x: hidden; max-width: 100%; }
+  body {
+    font-family: 'JetBrains Mono', 'VT323', monospace;
+    background: #050a0e;
+    color: #cfe8ec;
+    min-height: 100vh;
+    position: relative;
+  }
+  ::selection { background: #29c5d6; color: #050a0e; }
+  ::-webkit-scrollbar { width: 12px; }
+  ::-webkit-scrollbar-track { background: #050a0e; }
+  ::-webkit-scrollbar-thumb { background: #157a87; border: 2px solid #050a0e; }
+
+  @keyframes blink { 0%,49% { opacity:1; } 50%,100% { opacity:0; } }
+  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+  @keyframes glow { 0%,100% { text-shadow:0 0 6px rgba(41,197,214,0.2); } 50% { text-shadow:0 0 14px rgba(41,197,214,0.55); } }
+  @keyframes rowIn { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+  @keyframes ringPulse {
+    0%,100% { box-shadow: 0 0 14px rgba(41,197,214,0.45); }
+    50%     { box-shadow: 0 0 30px rgba(41,197,214,0.8); }
+  }
+  @keyframes waPulse {
+    0%,100% { box-shadow: 5px 5px 0 rgba(0,0,0,0.55), 0 0 16px rgba(79,214,160,0.35); }
+    50%     { box-shadow: 5px 5px 0 rgba(0,0,0,0.55), 0 0 34px rgba(79,214,160,0.7); }
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 2;
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 56px 20px 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .prompt {
+    font-size: 15px;
+    color: #1f8fa0;
+    margin-bottom: 26px;
+    animation: rowIn .4s ease both;
+  }
+  .prompt .cmd { color: #cfe8ec; }
+  .cursor {
+    display: inline-block; width: 8px; height: 14px;
+    background: #29c5d6; margin-left: 5px; vertical-align: -2px;
+    animation: blink 1.1s steps(1) infinite;
+  }
+
+  .avatar {
+    width: 158px; height: 158px; border-radius: 50%;
+    border: 3px solid #29c5d6; background: #050a0e;
+    display: grid; place-items: center;
+    animation: bob 4.6s ease-in-out infinite, ringPulse 3.2s ease-in-out infinite;
+  }
+  .avatar img { width: 112px; height: 112px; object-fit: contain; }
+
+  h1 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(14px, 4vw, 19px);
+    color: #29c5d6;
+    margin: 26px 0 0;
+    animation: glow 4s ease-in-out infinite;
+  }
+  .tag {
+    font-family: 'VT323', monospace;
+    font-size: 24px;
+    color: #7fa2ac;
+    margin: 14px 0 0;
+    line-height: 1.35;
+  }
+
+  /* fila de iconos pequeños (redes) */
+  .icons {
+    display: flex;
+    gap: 13px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 30px;
+  }
+  .ic {
+    --ac: #33c9d6;
+    --gl: rgba(51,201,214,0.32);
+    width: 54px; height: 54px;
+    display: grid; place-items: center;
+    text-decoration: none;
+    background: #0a1622;
+    border: 2px solid var(--ac);
+    color: var(--ac);
+    font-weight: 700; font-size: 16px;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.55);
+    transition: transform .15s ease, box-shadow .15s ease;
+    animation: rowIn .45s ease both;
+  }
+  .ic:hover, .ic:focus-visible {
+    transform: translateY(-3px);
+    box-shadow: 4px 7px 0 rgba(0,0,0,0.55), 0 0 18px var(--gl);
+    outline: none;
+  }
+  .ic svg { width: 25px; height: 25px; display: block; }
+  .glyph svg { width: 19px; height: 19px; display: block; }
+  .ic:nth-child(1) { animation-delay: .10s; }
+  .ic:nth-child(2) { animation-delay: .16s; }
+  .ic:nth-child(3) { animation-delay: .22s; }
+  .ic:nth-child(4) { animation-delay: .28s; }
+
+  .links {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 34px;
+  }
+
+  .ln {
+    --ac: #33c9d6;
+    --gl: rgba(51,201,214,0.32);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+    background: #0a1622;
+    border: 2px solid var(--ac);
+    padding: 15px 18px;
+    box-shadow: 5px 5px 0 rgba(0,0,0,0.55);
+    transition: transform .15s ease, box-shadow .15s ease;
+    animation: rowIn .45s ease both;
+  }
+  .ln:hover, .ln:focus-visible {
+    transform: translateY(-3px);
+    box-shadow: 5px 8px 0 rgba(0,0,0,0.55), 0 0 22px var(--gl);
+    outline: none;
+  }
+  .ln .glyph {
+    flex: 0 0 auto;
+    min-width: 46px; height: 40px;
+    display: grid; place-items: center;
+    border: 1px solid var(--ac);
+    color: var(--ac);
+    font-weight: 700; font-size: 15px;
+    background: #050a0e;
+    padding: 0 8px;
+  }
+  .ln .txt { flex: 1; text-align: left; min-width: 0; }
+  .ln .label {
+    display: block;
+    color: var(--ac);
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.4px;
+  }
+  .ln .handle {
+    display: block;
+    color: #7fa2ac;
+    font-size: 13px;
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ln .go { flex: 0 0 auto; color: var(--ac); font-weight: 700; font-size: 15px; }
+
+  /* WhatsApp destacado */
+  .ln.featured {
+    background: #4fd6a0;
+    border-color: #4fd6a0;
+    animation: rowIn .45s ease both, waPulse 2.6s ease-in-out infinite;
+  }
+  .ln.featured .glyph { background: #043326; border-color: #043326; color: #4fd6a0; }
+  .ln.featured .label { color: #043326; font-size: 17px; }
+  .ln.featured .handle { color: #0b5c46; }
+  .ln.featured .go { color: #043326; }
+  .ln.featured:hover, .ln.featured:focus-visible {
+    transform: translateY(-3px);
+    box-shadow: 5px 8px 0 rgba(0,0,0,0.55), 0 0 34px rgba(79,214,160,0.75);
+  }
+
+  .ln:nth-child(1) { animation-delay: .36s; }
+  .ln:nth-child(2) { animation-delay: .44s; }
+  .ln:nth-child(3) { animation-delay: .52s; }
+
+  footer {
+    margin-top: 44px;
+    font-size: 13px;
+    color: #5c7a86;
+    animation: rowIn .5s ease both;
+    animation-delay: .64s;
+  }
+  footer .out { color: #1f8fa0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; }
+  }
+
+  @media (max-width: 420px) {
+    .wrap { padding: 40px 14px 40px; }
+    .tag { font-size: 20px; }
+    .ln { padding: 13px 14px; gap: 11px; }
+    .ln .label { font-size: 15px; }
+    .ln .handle { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- MATRIX RAIN -->
+  <canvas id="matrixRain" style="position:fixed; inset:0; z-index:1; opacity:0.16; pointer-events:none;"></canvas>
+
+  <!-- CRT OVERLAYS -->
+  <div style="position:fixed; inset:0; pointer-events:none; z-index:92; background:repeating-linear-gradient(0deg, rgba(0,0,0,0.16) 0px, rgba(0,0,0,0.16) 1px, transparent 1px, transparent 3px);"></div>
+  <div style="position:fixed; inset:0; pointer-events:none; z-index:93; background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.5) 100%);"></div>
+
+  <main class="wrap">
+
+    <div class="prompt">aperture@lab:~$ <span class="cmd">./links.sh</span><span class="cursor"></span></div>
+
+    <div class="avatar">
+      <img src="../assets/aperture-eye-cyan.png" alt="Aperture">
+    </div>
+
+    <h1>APERTURE</h1>
+    <p class="tag">semillero de data science e ia</p>
+
+    <div class="icons">
+      <a class="ic" style="--ac:#c79bff; --gl:rgba(199,155,255,0.3);" href="https://instagram.com/aperture.systems" target="_blank" rel="noopener" title="Instagram" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"/></svg>
+      </a>
+      <a class="ic" style="--ac:#33c9d6; --gl:rgba(51,201,214,0.32);" href="https://www.tiktok.com/@aperture.systems" target="_blank" rel="noopener" title="TikTok" aria-label="TikTok">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+      </a>
+      <a class="ic" style="--ac:#f5b94d; --gl:rgba(245,185,77,0.3);" href="https://youtube.com/@aperture.systems" target="_blank" rel="noopener" title="YouTube" aria-label="YouTube">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+      </a>
+      <a class="ic" style="--ac:#4fd6a0; --gl:rgba(79,214,160,0.32);" href="mailto:aperture.systems.lab@gmail.com" title="Correo" aria-label="Correo">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+      </a>
+    </div>
+
+    <nav class="links">
+
+      <a class="ln featured" href="https://chat.whatsapp.com/Bi83DY3f9tDCSMHDUqyHDM?s=cl&amp;p=a&amp;ilr=4&amp;amv=2" target="_blank" rel="noopener">
+        <span class="glyph">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+        </span>
+        <span class="txt">
+          <span class="label">WhatsApp</span>
+          <span class="handle">únete al grupo del semillero</span>
+        </span>
+        <span class="go">&gt;_</span>
+      </a>
+
+      <a class="ln" style="--ac:#33c9d6; --gl:rgba(51,201,214,0.32);" href="https://aperture-systems-lab.github.io/aperture/" target="_blank" rel="noopener">
+        <span class="glyph">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95a15.65 15.65 0 00-1.38-3.56A8.03 8.03 0 0118.92 8zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2 0 .68.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56A7.987 7.987 0 015.08 16zm2.95-8H5.08a7.987 7.987 0 014.33-3.56A15.65 15.65 0 008.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2 0-.68.07-1.35.16-2h4.68c.09.65.16 1.32.16 2 0 .68-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a8.03 8.03 0 01-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2 0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z"/></svg>
+        </span>
+        <span class="txt">
+          <span class="label">Web</span>
+          <span class="handle">el sitio del semillero</span>
+        </span>
+        <span class="go">&gt;_</span>
+      </a>
+
+      <a class="ln" style="--ac:#5fb0ff; --gl:rgba(95,176,255,0.3);" href="https://github.com/aperture-systems-lab" target="_blank" rel="noopener">
+        <span class="glyph">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+        </span>
+        <span class="txt">
+          <span class="label">GitHub</span>
+          <span class="handle">aperture-systems-lab</span>
+        </span>
+        <span class="go">&gt;_</span>
+      </a>
+
+    </nav>
+
+    <footer>
+      aperture@lab:~$ <span class="out">echo "falta gente como tú"</span>
+    </footer>
+
+  </main>
+
+<script>
+  // Matrix rain (versión compacta para esta página)
+  (function () {
+    var canvas = document.getElementById('matrixRain');
+    var ctx = canvas.getContext('2d');
+    var chars = '01アイウエオカキクケコ<>/{}[]$#λΣπ';
+    var fontSize = 15, drops = [];
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      var cols = Math.floor(canvas.width / fontSize);
+      drops = [];
+      for (var i = 0; i < cols; i++) drops.push(Math.random() * -60);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    setInterval(function () {
+      ctx.fillStyle = 'rgba(5,10,14,0.12)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.font = fontSize + 'px monospace';
+      for (var i = 0; i < drops.length; i++) {
+        ctx.fillStyle = Math.random() > 0.96 ? '#9ff2fb' : '#29c5d6';
+        var ch = chars.charAt(Math.floor(Math.random() * chars.length));
+        ctx.fillText(ch, i * fontSize, drops[i] * fontSize);
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      }
+    }, 66);
+  })();
+</script>
+</body>
+</html>
