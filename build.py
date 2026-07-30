@@ -92,7 +92,6 @@ def build_data():
             {"num": n, "title": t, "text": x, "accent": hexof(c), "glow": glowof(c)}
             for (n, t, x, c) in C.ACCESO_PUNTOS
         ],
-        "githubUrl": C.GITHUB,
         "bootRows": [
             {"label": l, "value": v, **({"accent": True} if i == len(C.BOOT) - 1 else {})}
             for i, (l, v) in enumerate(C.BOOT)

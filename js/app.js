@@ -10,7 +10,6 @@
   "use strict";
 
   var DATA = window.APERTURE_DATA || {};
-  var GITHUB_URL = DATA.githubUrl || 'https://github.com/';
   var bootRows = DATA.bootRows || [];
   var studyLines = DATA.lines || [];
   var access = DATA.access || [];
@@ -630,7 +629,7 @@
   }
 
   /* ---------- BOOT TERMINAL ---------- */
-  function startBoot(onDone) {
+  function startBoot() {
     var lines = 0, closing = false, timers = [];
     var mount = $('bootMount');
     function rowHtml(r) {
@@ -663,7 +662,6 @@
     function finish() {
       mount.innerHTML = '';
       $('nav').style.animation = 'siteIn 0.6s ease';
-      if (onDone) onDone();
     }
     function skip() {
       timers.forEach(clearTimeout); timers = [];

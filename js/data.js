@@ -60,7 +60,6 @@ window.APERTURE_DATA = {
       "glow": "rgba(245,185,77,0.3)"
     }
   ],
-  "githubUrl": "https://github.com/aperture-systems-lab",
   "bootRows": [
     {
       "label": "SYSTEM",
