@@ -1,15 +1,9 @@
-/* ============================================================
-   Aperture · Semillero de Data Science e IA
-   Estilos globales, animaciones y reglas responsive.
-   ============================================================ */
-
 * { box-sizing: border-box; }
 html, body { margin: 0; overflow-x: hidden; max-width: 100%; }
 img { max-width: 100%; }
-/* La fila de chips ocupa el ancho y envuelve (no se desborda) */
+
 #heroChips { width: 100%; }
 
-/* ---------- Animaciones ---------- */
 @keyframes blink { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
 @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
 @keyframes popIn { from { opacity:0; transform: translateY(10px);} to { opacity:1; transform: translateY(0);} }
@@ -26,20 +20,19 @@ img { max-width: 100%; }
 @keyframes siteIn { from { filter:brightness(2.6); } to { filter:brightness(1); } }
 @keyframes irisPulse { 0%,100% { transform: scale(1); opacity:0.5; } 50% { transform: scale(1.12); opacity:0.85; } }
 
-/* ---------- Selección y scrollbar ---------- */
 ::selection { background: #29c5d6; color: #050a0e; }
 ::-webkit-scrollbar { width: 12px; }
 ::-webkit-scrollbar-track { background:#050a0e; }
 ::-webkit-scrollbar-thumb { background:#157a87; border:2px solid #050a0e; }
 
-/* En móvil la barra pintada se queda fija a la derecha y roba ancho, cosa que
-   no hace la barra flotante nativa del sistema. Se oculta; el scroll sigue. */
 @media (max-width: 820px) {
-  html { scrollbar-width: none; }              /* Firefox */
-  ::-webkit-scrollbar { width: 0; height: 0; } /* Chrome, Safari */
+  html, body { scrollbar-width: none; -ms-overflow-style: none; }
+  html::-webkit-scrollbar, body::-webkit-scrollbar, ::-webkit-scrollbar {
+    display: none; width: 0; height: 0; background: transparent;
+  }
+  ::-webkit-scrollbar-track, ::-webkit-scrollbar-thumb { background: transparent; }
 }
 
-/* ---------- Interacciones ---------- */
 .mobtoggle { display:none; }
 .menuitem > button:hover { color:#29c5d6 !important; }
 .social:hover { transform:translateY(-3px); box-shadow:4px 8px 0 rgba(0,0,0,0.5), 0 0 18px var(--glow) !important; }
@@ -48,22 +41,14 @@ img { max-width: 100%; }
 .linea:hover { transform:translateY(-5px); border-color:var(--acento) !important; box-shadow:6px 11px 0 rgba(0,0,0,0.5), 0 0 26px var(--glow) !important; }
 .calday:hover { transform:translateY(-2px); box-shadow:0 0 16px rgba(79,214,160,0.5) !important; }
 
-/* El mes a la izquierda y su leyenda al lado; apilados si no caben. */
 .calgrid { display:grid; grid-template-columns:minmax(0,620px) minmax(210px,1fr); gap:26px; align-items:start; }
 @media (max-width: 900px) { .calgrid { grid-template-columns:1fr; gap:20px; } }
-/* También al apilarse: sin tope, las casillas saldrían anchas y aplastadas. */
+
 #calMes { max-width: 620px; }
 
-/* ============================================================
-   VITRINAS · una animación por línea de estudio
-   Los SVG los monta js/app.js (120 × 52); aquí solo el movimiento.
-   Los valores fuera de @keyframes son el estado de reposo: es lo
-   que se ve con prefers-reduced-motion.
-   ============================================================ */
 .viz svg { display:block; width:100%; height:auto; aspect-ratio: 120 / 52; }
 .viz .eje { stroke:#173241; stroke-width:1; }
 
-/* --- Data Science y ML · la recta se endereza hasta ajustar la nube --- */
 .viz .punto {
   fill:#33c9d6; transform-box:fill-box; transform-origin:center;
   animation: puntoIn 5s ease-out infinite;
@@ -94,7 +79,6 @@ img { max-width: 100%; }
   100% { opacity:0; }
 }
 
-/* --- IA · una onda de activación recorre la red capa a capa --- */
 .viz .sinapsis {
   stroke:#f5b94d; stroke-width:0.7; opacity:0.18;
   animation: sinapsis 3.2s ease-out infinite;
@@ -115,7 +99,6 @@ img { max-width: 100%; }
   52%,100% { fill:#1a1206; stroke:#f5b94d; transform:scale(1); filter:none; }
 }
 
-/* --- HPC · tres chips con la matriz de núcleos encendiéndose --- */
 .viz .pata { stroke:#c79bff; stroke-width:1.6; opacity:0.55; }
 .viz .encapsulado { fill:#150f24; stroke:#c79bff; stroke-width:1.6; }
 .viz .dado { fill:#0d0a17; stroke:rgba(199,155,255,0.4); stroke-width:1; }
@@ -125,8 +108,6 @@ img { max-width: 100%; }
   14%,30% { opacity:1; }
 }
 
-/* ---------- Diagramas de los temas (ficha de línea) ---------- */
-/* Toman el color de acento del <li> que los contiene. */
 .dgm {
   display:block; width:100%; height:auto; margin-bottom:10px;
   fill:none; stroke:currentColor; stroke-width:1.4;
@@ -137,12 +118,10 @@ img { max-width: 100%; }
 .dgm .tenue-trazo { opacity:0.45; }
 .dgm .guion { stroke-dasharray:3 2.5; }
 
-/* Con menos movimiento, las vitrinas quedan como tres dibujos quietos. */
 @media (prefers-reduced-motion: reduce) {
   .viz svg * { animation: none !important; }
 }
 
-/* ---------- Responsive ---------- */
 @media (max-width: 820px) {
   .navtabs { display:none !important; width:100%; flex-direction:column !important; align-items:stretch !important; gap:0 !important; border-top:2px solid #157a87; margin-top:10px; }
   .navtabs.open { display:flex !important; }
@@ -152,24 +131,23 @@ img { max-width: 100%; }
   .mobtoggle { display:inline-flex !important; }
 }
 @media (max-width: 620px) {
-  /* Las 3 gráficas del lab se apilan: el canvas necesita más alto. */
+
   #neuralNet { height: 560px !important; }
-  /* El calendario cabe justo: casillas más bajas y números más pequeños. */
+
   .calcell { height: 38px !important; font-size: 13px !important; }
-  /* Los modales ganan ancho pegándose más a los bordes. */
+
   .ovback { padding: 18px 10px !important; }
 
-  /* Textos grandes más cómodos en celular y sin desbordar */
   #heroText { font-size: 19px !important; max-width: 100% !important; }
   #aboutText { font-size: 19px !important; }
   #contactText { font-size: 20px !important; }
   #labPhrase { font-size: 17px !important; }
 }
-/* Pantallas muy pequeñas: menos padding lateral para ganar ancho */
+
 @media (max-width: 420px) {
   header { padding-left: 14px !important; padding-right: 14px !important; }
   #heroText { font-size: 17px !important; }
-  /* El calendario es lo más apretado de la página: 7 columnas fijas. */
+
   .calcell { height: 34px !important; font-size: 12px !important; }
   .calrejilla { gap: 3px !important; }
   .calcuerpo { padding: 10px 9px 12px !important; }

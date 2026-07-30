@@ -1,10 +1,3 @@
-/* ============================================================
-   Aperture · Contenido del sitio (GENERADO)
-   ------------------------------------------------------------
-   NO edites este archivo a mano: se genera desde content.py
-   con  python build.py
-   ============================================================ */
-
 window.APERTURE_DATA = {
   "site": {
     "title": "Aperture · Semillero de Data Science e IA",

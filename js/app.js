@@ -1,11 +1,3 @@
-/* ============================================================
-   Aperture · Lógica del sitio
-   ------------------------------------------------------------
-   Renderiza las líneas de estudio, el calendario, las redes, los
-   modales, la navegación, la pantalla de arranque y las
-   visualizaciones (matrix + red).
-   El contenido vive en js/data.js (window.APERTURE_DATA).
-   ============================================================ */
 (function () {
   "use strict";
 
@@ -33,7 +25,6 @@
     if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 64, behavior: 'smooth' });
   }
 
-  /* ---------- TEXTOS DEL SITIO ---------- */
   function applySite() {
     if (site.title) document.title = site.title;
     setHTML('heroTitle', site.heroTitle);
@@ -49,7 +40,6 @@
     }
   }
 
-  /* ---------- FECHAS ---------- */
   var MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio',
                'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
   var MESES_ABR = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
@@ -57,24 +47,19 @@
   var DIAS_INI = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 
   function pad2(n) { return (n < 10 ? '0' : '') + n; }
-  // Partimos la cadena a mano: new Date('2026-08-27') la leería como UTC y en
-  // husos al oeste caería en el día anterior.
+
   function parseISO(s) { var p = String(s).split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
   function toISO(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
-  function wdIdx(d) { return (d.getDay() + 6) % 7; }   // 0 = lunes … 6 = domingo
+  function wdIdx(d) { return (d.getDay() + 6) % 7; }
   function fechaLarga(d) { return DIAS[wdIdx(d)] + ' ' + d.getDate() + ' de ' + MESES[d.getMonth()] + ' de ' + d.getFullYear(); }
   function fechaCorta(d) { return d.getDate() + ' ' + MESES_ABR[d.getMonth()]; }
 
-  /* ---------- CALENDARIO ---------- */
-  var CELDA = 46;                                     // alto de cada casilla
+  var CELDA = 46;
   var CAL_START = cal.start ? parseISO(cal.start) : null;
   var CAL_END = cal.end ? parseISO(cal.end) : null;
   var MEET_WD = cal.meetingWeekday == null ? 2 : cal.meetingWeekday;
   var HITOS = cal.milestones || {};
 
-  // Las reuniones no se listan una a una en content.py: se deducen del día de
-  // la semana dentro de la época de clases. Solo las que ya tienen tema puesto
-  // traen texto propio; el resto salen como «por definir».
   var meetings = (function () {
     var out = [], d, extra, iso;
     if (!CAL_START || !CAL_END) return out;
@@ -99,7 +84,6 @@
     return m;
   })();
 
-  // El cuadrito de la leyenda imita la celda que describe.
   function legendItem(color, glyph, text, bg) {
     return '' +
     '<span style="display:inline-flex; align-items:center; gap:8px; font-family:\'JetBrains Mono\',monospace; font-size:13px; color:#9fc4cd;">' +
@@ -108,8 +92,6 @@
     '</span>';
   }
 
-  // Una celda del mes. Los miércoles de clases son <button> (abren la ficha de
-  // la reunión); el resto son <span>, para que el tabulador no pare en ellos.
   function dayCell(d) {
     var iso = toISO(d);
     var hoy = toISO(new Date()) === iso;
@@ -145,8 +127,6 @@
     return '<span class="calcell"' + (hito ? ' title="' + esc(hito.label) + '"' : '') + ' style="' + style + '">' + d.getDate() + '</span>';
   }
 
-  // El calendario se ve de mes en mes: esta es la lista por la que se navega,
-  // de punta a punta de la época de clases.
   var CAL_MESES = (function () {
     var out = [];
     if (!CAL_START || !CAL_END) return out;
@@ -159,7 +139,6 @@
     return out;
   })();
 
-  // Se abre en el mes en curso si cae dentro; si no, en el primero.
   var mesIdx = (function () {
     var hoy = new Date(), i;
     for (i = 0; i < CAL_MESES.length; i++) {
@@ -208,7 +187,6 @@
     '</div>';
   }
 
-  // Repinta solo el mes: el resto de la sección se queda como está.
   function pintarMes() {
     var caja = $('calMes');
     if (!caja) return;
@@ -225,8 +203,6 @@
     if (!mount) return;
     if (!CAL_MESES.length) { mount.innerHTML = ''; return; }
 
-    // Las fechas marcadas entran en la propia leyenda, cada una con su color y
-    // su día, en vez de repetirse aparte.
     var hitos = Object.keys(HITOS).sort().map(function (iso) {
       var h = HITOS[iso], d = parseISO(iso);
       return legendItem(h.accent, '&#9670;', fechaCorta(d) + ' · ' + h.label.toLowerCase(), 'transparent');
@@ -238,8 +214,6 @@
       '<h3 style="font-family:\'Press Start 2P\'; font-size:clamp(13px,2.4vw,20px); color:#29c5d6; margin:0 0 10px;">' + esc(cal.title || 'CALENDARIO') + '</h3>' +
       '<p style="font-size:24px; color:#7fa2ac; margin:0 0 18px; font-family:\'VT323\',monospace;">' + esc(cal.text || '') + '</p>' +
 
-      // El mes manda a la izquierda; a su lado, lo que antes lo empujaba
-      // hacia abajo: leyenda, fechas marcadas y el acceso al listado.
       '<div class="calgrid">' +
         '<div id="calMes"></div>' +
         '<aside style="display:flex; flex-direction:column; gap:18px;">' +
@@ -257,7 +231,6 @@
     $('verReuniones').addEventListener('click', openMeetingList);
   }
 
-  /* ---------- LISTA DE REUNIONES ---------- */
   function openMeetingList() {
     var pendientes = meetings.filter(function (r) { return !r.planned; }).length;
     var rows = meetings.map(function (r, i) {
@@ -282,9 +255,6 @@
     });
   }
 
-  /* ---------- CÓMO SE ENTRA ----------
-     Va justo antes de las líneas: primero se dice que se puede entrar sin
-     saber, y solo después de qué va cada línea. */
   function renderAccess() {
     var mount = $('accessMount');
     if (!mount || !access.length) return;
@@ -304,16 +274,10 @@
       '<h3 style="font-family:\'Press Start 2P\'; font-size:clamp(13px,2.4vw,20px); color:#29c5d6; margin:0 0 14px;">' + esc(site.accessTitle || '') + '</h3>' +
       '<p style="font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:clamp(17px,2.6vw,23px); line-height:1.4; color:#fff; margin:0 0 22px; max-width:760px;">' +
         '<span style="color:#4fd6a0;">&gt;</span> ' + esc(site.accessPhrase || '') + '</p>' +
-      // min(...,100%) para que en pantallas muy angostas la columna se
-      // encoja en vez de desbordar el ancho de la página.
+
       '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(258px,100%),1fr)); gap:16px;">' + tarjetas + '</div>' +
     '</div>';
   }
-
-  /* ---------- LÍNEAS DE ESTUDIO ---------- */
-  /* Las tres tarjetas, cada una con su animación (ver VITRINAS abajo) y su
-     ficha: nombre oficial, una frase y tres temas con su diagrama. Los datos
-     salen del reporte del semillero en HERMES (ID 8004), apartado «Enfoque». */
 
   function lineCard(l) {
     return '' +
@@ -341,13 +305,6 @@
     });
     mountVitrinas(mount);
   }
-
-  /* ---------- VITRINAS (una animación por línea) ----------
-     Tres SVG montados aquí para no llenar el HTML de nodos repetidos; el
-     movimiento lo pone el CSS (css/styles.css, sección «vitrinas»).
-       ds   una recta que baja hasta ajustar la nube, y los residuos
-       ia   una red 2-4-4-2 recorrida capa a capa por una onda
-       hpc  tres chips con la matriz de núcleos del die encendiéndose  */
 
   var SVGNS = 'http://www.w3.org/2000/svg';
   var VIZ_W = 120, VIZ_H = 52;
@@ -388,7 +345,7 @@
       for (var i = 0; i < n; i++) ys.push([X[c], VIZ_H / 2 + (i - (n - 1) / 2) * SEP]);
       return ys;
     });
-    // Las conexiones van primero, para que los nodos queden por encima.
+
     capas.slice(0, -1).forEach(function (capa, c) {
       capa.forEach(function (a) {
         capas[c + 1].forEach(function (b) {
@@ -450,16 +407,12 @@
   function mountVitrinas(root) {
     Array.prototype.forEach.call((root || document).querySelectorAll('.viz[data-viz]'), function (caja) {
       var f = VITRINAS[caja.getAttribute('data-viz')];
-      // SVG nuevo en cada montaje: así la animación arranca desde el principio.
+
       caja.innerHTML = '';
       if (f) caja.appendChild(f());
     });
   }
 
-  /* ---------- DIAGRAMAS DE LOS TEMAS ----------
-     Dibujos fijos de 44×26 que toman el color de acento de su línea.
-       lleno        la pieza va maciza en vez de solo con trazo
-       tenue        maciza pero al fondo, para lo que acompaña sin competir  */
   var DIAGRAMAS = {
     histograma:
       '<rect class="tenue" x="4" y="16" width="6" height="6.5"/>' +
@@ -524,7 +477,6 @@
       '<path class="guion" d="M36 12.5 V20 H8 V13.8"/><polyline points="6.4,15.4 8,13.8 9.6,15.4"/>'
   };
 
-  /* ---------- SOCIALS ---------- */
   function renderSocials() {
     $('socialsMount').innerHTML = socials.map(function (s) {
       return '' +
@@ -538,9 +490,6 @@
     }).join('');
   }
 
-  /* ---------- MODALES ----------
-     Un solo armazón (ventana de terminal sobre el fondo oscurecido) que
-     reutilizan la reunión, la lista de reuniones y la ficha de línea. */
   function openOverlay(color, meta, ancho, cuerpo) {
     $('modalMount').innerHTML = '' +
     '<div id="ovBack" class="ovback" style="position:fixed; inset:0; z-index:150; background:rgba(3,7,12,0.86); display:flex; align-items:flex-start; justify-content:center; padding:42px 18px; overflow-y:auto;">' +
@@ -561,7 +510,6 @@
   }
   function closeModal() { $('modalMount').innerHTML = ''; }
 
-  /* ---------- FICHA DE UNA REUNIÓN ---------- */
   function openMeeting(i) {
     var r = meetings[i];
     if (!r) return;
@@ -584,7 +532,6 @@
     openOverlay(color, 'aperture@lab:~$ cat ./reuniones/' + r.iso + '.md', '640px', cuerpo);
   }
 
-  /* ---------- FICHA DE UNA LÍNEA ---------- */
   function openLine(key) {
     var l = null;
     studyLines.forEach(function (x) { if (x.key === key) l = x; });
@@ -599,7 +546,7 @@
     }).join('');
 
     var cuerpo = '' +
-      // La animación manda: se sale del padding para llenar el ancho de la ficha.
+
       '<div class="viz" data-viz="' + esc(l.key) + '" aria-hidden="true" style="display:block; border-bottom:2px solid ' + l.accent + '; background:#04080c; margin:-22px -24px 20px;"></div>' +
       '<div style="font-family:\'JetBrains Mono\',monospace; font-size:11px; letter-spacing:0.6px; text-transform:uppercase; color:#5c7a86; margin-bottom:10px;">' + esc(l.alias) + '</div>' +
       '<h3 style="font-family:\'Press Start 2P\'; font-size:clamp(11px,2.2vw,15px); line-height:1.75; color:' + l.accent + '; margin:0 0 12px; font-weight:400;">' + esc(l.title) + '</h3>' +
@@ -610,7 +557,6 @@
     mountVitrinas($('modalMount'));
   }
 
-  /* ---------- NAV ---------- */
   function initNav() {
     var open = false;
     var tabs = $('navtabs'), toggle = $('mobtoggle');
@@ -628,7 +574,6 @@
     });
   }
 
-  /* ---------- BOOT TERMINAL ---------- */
   function startBoot() {
     var lines = 0, closing = false, timers = [];
     var mount = $('bootMount');
@@ -677,7 +622,6 @@
     timers.push(setTimeout(finish, done + 650));
   }
 
-  /* ---------- MATRIX RAIN ---------- */
   function startMatrix() {
     var c = $('matrixRain');
     if (!c) return;
@@ -707,7 +651,6 @@
     draw();
   }
 
-  /* ---------- NEURAL NET VIZ ---------- */
   function startNeuralNet() {
     var c = $('neuralNet');
     if (!c) return;
@@ -733,8 +676,7 @@
       var t = frame / 60;
       ctx.clearRect(0, 0, W, H);
       var pad = 16, gap = 18, topPad = 30, botPad = 16;
-      // En pantallas angostas las 3 gráficas se apilan (1 columna).
-      // Mismo punto de quiebre que el CSS (#neuralNet en 620px).
+
       var cols = window.innerWidth <= 620 ? 1 : 3;
       var rows = Math.ceil(3 / cols);
       var pw = (W - pad * 2 - gap * (cols - 1)) / cols;
@@ -752,7 +694,6 @@
         ctx.fillText(titles[i], p.x + 1, p.y - 9);
       });
 
-      // Panel 0 — breathing gaussian histogram
       (function () {
         var p = P[0];
         var mean = (NB - 1) / 2 + Math.sin(t * 0.6) * 2.4;
@@ -771,7 +712,6 @@
         ctx.stroke();
       })();
 
-      // Panel 1 — live clustering
       (function () {
         var p = P[1];
         var ix = p.x + 14, iy = p.y + 12, iw = p.w - 28, ih = p.h - 24;
@@ -806,7 +746,6 @@
         });
       })();
 
-      // Panel 2 — GPU kernel grid
       (function () {
         var p = P[2];
         var cw = (p.w - 6) / GX, ch = (p.h - 6) / GY;
@@ -826,7 +765,6 @@
     draw();
   }
 
-  /* ---------- INIT ---------- */
   function init() {
     applySite();
     renderAccess();

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BUILD.PY — Genera js/data.js a partir de content.py
 
@@ -14,9 +13,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
-import content as C  # noqa: E402
+import content as C
 
-# Glow (resplandor) por color, para el hover de las tarjetas.
 GLOWS = {
     "#33c9d6": "rgba(51,201,214,0.32)",
     "#4fd6a0": "rgba(79,214,160,0.32)",
@@ -25,16 +23,13 @@ GLOWS = {
     "#5fb0ff": "rgba(95,176,255,0.3)",
 }
 
-
 def hexof(color):
     """Acepta un nombre de COLORES o un código hex directo."""
     return C.COLORES.get(color, color)
 
-
 def glowof(color):
     h = hexof(color)
     return GLOWS.get(h, "rgba(41,197,214,0.3)")
-
 
 def build_lines():
     out = []
@@ -53,7 +48,6 @@ def build_lines():
         })
     return out
 
-
 def build_calendar():
     return {
         "title": C.CALENDARIO_TITULO,
@@ -70,7 +64,6 @@ def build_calendar():
             f: {"label": lbl, "accent": hexof(col)} for f, (lbl, col) in C.HITOS.items()
         },
     }
-
 
 def build_data():
     return {
@@ -105,22 +98,12 @@ def build_data():
         ],
     }
 
-
 def main():
     data = build_data()
     body = json.dumps(data, ensure_ascii=False, indent=2)
-    header = (
-        "/* ============================================================\n"
-        "   Aperture · Contenido del sitio (GENERADO)\n"
-        "   ------------------------------------------------------------\n"
-        "   NO edites este archivo a mano: se genera desde content.py\n"
-        "   con  python build.py\n"
-        "   ============================================================ */\n\n"
-    )
     out = ROOT / "js" / "data.js"
-    out.write_text(header + "window.APERTURE_DATA = " + body + ";\n", encoding="utf-8")
+    out.write_text("window.APERTURE_DATA = " + body + ";\n", encoding="utf-8")
     print(f"OK · generado {out.relative_to(ROOT)}")
-
 
 if __name__ == "__main__":
     main()
