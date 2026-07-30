@@ -32,6 +32,13 @@ img { max-width: 100%; }
 ::-webkit-scrollbar-track { background:#050a0e; }
 ::-webkit-scrollbar-thumb { background:#157a87; border:2px solid #050a0e; }
 
+/* En móvil la barra pintada se queda fija a la derecha y roba ancho, cosa que
+   no hace la barra flotante nativa del sistema. Se oculta; el scroll sigue. */
+@media (max-width: 820px) {
+  html { scrollbar-width: none; }              /* Firefox */
+  ::-webkit-scrollbar { width: 0; height: 0; } /* Chrome, Safari */
+}
+
 /* ---------- Interacciones ---------- */
 .mobtoggle { display:none; }
 .menuitem > button:hover { color:#29c5d6 !important; }
