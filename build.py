@@ -36,24 +36,40 @@ def glowof(color):
     return GLOWS.get(h, "rgba(41,197,214,0.3)")
 
 
-def build_news():
+def build_lines():
     out = []
-    for i, n in enumerate(C.BITACORA):
-        accent = hexof(n.get("color", "cian"))
-        entry = {
-            "tag": n["tag"],
-            "date": n["fecha"],
-            "title": n["titulo"],
-            "text": n["texto"],
-            "accent": accent,
-            "meta": n.get("meta", f"commit #{len(C.BITACORA) - i:03d} · main"),
-        }
-        if n.get("link"):
-            entry["link"] = {"url": n["link"]["url"], "label": n["link"].get("texto", "abrir")}
-        if n.get("chart"):
-            entry["chart"] = [{"label": t, "count": c, "pct": p} for (t, c, p) in n["chart"]]
-        out.append(entry)
+    for l in C.LINEAS:
+        color = l.get("color", "cian")
+        out.append({
+            "key": l["clave"],
+            "accent": hexof(color),
+            "glow": glowof(color),
+            "name": l["nombre"],
+            "summary": l["resumen"],
+            "alias": l["alias"],
+            "title": l["titulo"],
+            "essence": l["esencia"],
+            "topics": [{"name": n, "dgm": d} for (n, d) in l["temas"]],
+        })
     return out
+
+
+def build_calendar():
+    return {
+        "title": C.CALENDARIO_TITULO,
+        "text": C.CALENDARIO_TEXTO,
+        "start": C.CLASES_INICIO,
+        "end": C.CLASES_FIN,
+        "meetingWeekday": C.REUNION_DIA,
+        "meetingTitle": C.REUNION_TITULO,
+        "meetingNote": C.REUNION_NOTA,
+        "meetings": {
+            f: {"title": t, "text": x} for f, (t, x) in C.REUNIONES.items()
+        },
+        "milestones": {
+            f: {"label": lbl, "accent": hexof(col)} for f, (lbl, col) in C.HITOS.items()
+        },
+    }
 
 
 def build_data():
@@ -67,13 +83,22 @@ def build_data():
             "labPhrase": C.LAB_FRASE,
             "contactTitle": C.CONTACTO_TITULO,
             "contactText": C.CONTACTO_TEXTO,
+            "linesTitle": C.LINEAS_TITULO,
+            "linesText": C.LINEAS_TEXTO,
+            "accessTitle": C.ACCESO_TITULO,
+            "accessPhrase": C.ACCESO_FRASE,
         },
+        "access": [
+            {"num": n, "title": t, "text": x, "accent": hexof(c), "glow": glowof(c)}
+            for (n, t, x, c) in C.ACCESO_PUNTOS
+        ],
         "githubUrl": C.GITHUB,
         "bootRows": [
             {"label": l, "value": v, **({"accent": True} if i == len(C.BOOT) - 1 else {})}
             for i, (l, v) in enumerate(C.BOOT)
         ],
-        "news": build_news(),
+        "lines": build_lines(),
+        "calendar": build_calendar(),
         "socials": [
             {"label": lbl, "handle": h, "url": u, "glyph": g,
              "accent": hexof(col), "glow": glowof(col)}

@@ -1,8 +1,9 @@
 /* ============================================================
    Aperture · Lógica del sitio
    ------------------------------------------------------------
-   Renderiza la bitácora, redes, modal de noticias, navegación,
-   pantalla de arranque y las visualizaciones (matrix + red).
+   Renderiza las líneas de estudio, el calendario, las redes, los
+   modales, la navegación, la pantalla de arranque y las
+   visualizaciones (matrix + red).
    El contenido vive en js/data.js (window.APERTURE_DATA).
    ============================================================ */
 (function () {
@@ -11,7 +12,9 @@
   var DATA = window.APERTURE_DATA || {};
   var GITHUB_URL = DATA.githubUrl || 'https://github.com/';
   var bootRows = DATA.bootRows || [];
-  var news = DATA.news || [];
+  var studyLines = DATA.lines || [];
+  var access = DATA.access || [];
+  var cal = DATA.calendar || {};
   var socials = DATA.socials || [];
   var site = DATA.site || {};
 
@@ -47,84 +50,480 @@
     }
   }
 
-  /* ---------- BITACORA (groups) ---------- */
-  function blogCard(n, i) {
-    var color = n.accent, glow = glowFor(n.accent);
+  /* ---------- FECHAS ---------- */
+  var MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio',
+               'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+  var MESES_ABR = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  var DIAS = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+  var DIAS_INI = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  // Partimos la cadena a mano: new Date('2026-08-27') la leería como UTC y en
+  // husos al oeste caería en el día anterior.
+  function parseISO(s) { var p = String(s).split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+  function toISO(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+  function wdIdx(d) { return (d.getDay() + 6) % 7; }   // 0 = lunes … 6 = domingo
+  function fechaLarga(d) { return DIAS[wdIdx(d)] + ' ' + d.getDate() + ' de ' + MESES[d.getMonth()] + ' de ' + d.getFullYear(); }
+  function fechaCorta(d) { return d.getDate() + ' ' + MESES_ABR[d.getMonth()]; }
+
+  /* ---------- CALENDARIO ---------- */
+  var CELDA = 46;                                     // alto de cada casilla
+  var CAL_START = cal.start ? parseISO(cal.start) : null;
+  var CAL_END = cal.end ? parseISO(cal.end) : null;
+  var MEET_WD = cal.meetingWeekday == null ? 2 : cal.meetingWeekday;
+  var HITOS = cal.milestones || {};
+
+  // Las reuniones no se listan una a una en content.py: se deducen del día de
+  // la semana dentro de la época de clases. Solo las que ya tienen tema puesto
+  // traen texto propio; el resto salen como «por definir».
+  var meetings = (function () {
+    var out = [], d, extra, iso;
+    if (!CAL_START || !CAL_END) return out;
+    for (d = new Date(CAL_START); d <= CAL_END; d.setDate(d.getDate() + 1)) {
+      if (wdIdx(d) !== MEET_WD) continue;
+      iso = toISO(d);
+      extra = (cal.meetings || {})[iso];
+      out.push({
+        iso: iso,
+        date: new Date(d),
+        title: extra && extra.title ? extra.title : (cal.meetingTitle || 'Reunión del semillero'),
+        text: extra && extra.text ? extra.text : (cal.meetingNote || ''),
+        planned: !!(extra && extra.title)
+      });
+    }
+    return out;
+  })();
+
+  var meetIdx = (function () {
+    var m = {};
+    meetings.forEach(function (r, i) { m[r.iso] = i; });
+    return m;
+  })();
+
+  // El cuadrito de la leyenda imita la celda que describe.
+  function legendItem(color, glyph, text, bg) {
     return '' +
-    '<button class="bcard" data-news="' + i + '" style="--glow:' + glow + '; cursor:pointer; text-align:left; width:100%; background:linear-gradient(180deg,#0b1a26,#070f18); border:2px solid #173241; box-shadow:6px 6px 0 rgba(0,0,0,0.5); padding:0; display:flex; flex-direction:column; overflow:hidden; position:relative; transition:transform .14s, box-shadow .14s;">' +
-      '<span style="height:3px; background:' + color + '; box-shadow:0 0 12px ' + glow + ';"></span>' +
-      '<span style="display:flex; align-items:center; gap:10px; padding:10px 18px; background:rgba(7,15,24,0.55); border-bottom:1px solid #122b34; flex-wrap:wrap;">' +
-        '<span style="width:9px; height:9px; background:#11505c; border-radius:50%;"></span>' +
-        '<span style="width:9px; height:9px; background:#1f8fa0; border-radius:50%;"></span>' +
-        '<span style="width:9px; height:9px; background:' + color + '; border-radius:50%; box-shadow:0 0 8px ' + glow + ';"></span>' +
-        '<span style="font-family:\'JetBrains Mono\',monospace; font-size:11px; font-weight:700; letter-spacing:0.6px; color:#050a0e; background:' + color + '; padding:3px 9px; margin-left:5px;">' + esc(n.tag) + '</span>' +
-        '<span style="flex:1; font-family:\'JetBrains Mono\',monospace; font-size:12px; color:#5c7a86; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + esc(n.meta) + '</span>' +
-        '<span style="font-family:\'JetBrains Mono\',monospace; font-size:11px; color:' + color + '; border:1px solid ' + color + '; padding:2px 8px; white-space:nowrap;">' + esc(n.date) + '</span>' +
-      '</span>' +
-      '<span class="bcard-body" style="display:flex; align-items:center; gap:26px; padding:20px 24px; flex-wrap:wrap;">' +
-        '<span style="flex:0 1 280px; min-width:0; font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:23px; color:#fff; line-height:1.25;">' + esc(n.title) + '</span>' +
-        '<span style="flex:1 1 300px; min-width:0; font-size:22px; color:#9fc4cd; font-family:\'VT323\',monospace; line-height:1.3;">' + esc(n.text) + '</span>' +
-        '<span class="bcard-leer" style="flex:none; font-family:\'JetBrains Mono\',monospace; font-size:13px; font-weight:700; color:#050a0e; background:' + color + '; padding:9px 18px; box-shadow:3px 3px 0 rgba(0,0,0,0.4);">leer ▸</span>' +
-      '</span>' +
-    '</button>';
+    '<span style="display:inline-flex; align-items:center; gap:8px; font-family:\'JetBrains Mono\',monospace; font-size:13px; color:#9fc4cd;">' +
+      '<span style="width:17px; height:17px; display:grid; place-items:center; font-size:9px; color:' + color + '; border:2px solid ' + color + '; background:' + (bg || 'transparent') + ';">' + glyph + '</span>' +
+      esc(text) +
+    '</span>';
   }
 
-  function renderGroups() {
-    var items = news.map(blogCard).join('');
-    var html = '' +
-    '<div id="bitacora" style="scroll-margin-top:72px;">' +
-      '<div style="font-family:\'JetBrains Mono\',monospace; font-size:16px; color:#1f8fa0; margin-bottom:6px;">aperture@lab:~$ <span style="color:#cfe8ec;">cat ./bitacora.log</span></div>' +
-      '<h3 style="font-family:\'Press Start 2P\'; font-size:clamp(13px,2.4vw,20px); color:#29c5d6; margin:0 0 10px;">BITÁCORA</h3>' +
-      '<p style="font-size:24px; color:#7fa2ac; margin:0 0 18px; font-family:\'VT323\',monospace;">El registro del semillero: anuncios, sesiones y avances del camino.</p>' +
-      '<div style="display:flex; flex-direction:column; gap:16px;">' + items + '</div>' +
-      '<div style="display:flex; justify-content:center; margin-top:26px;">' +
-        '<button class="alllink" id="verRegistros" style="cursor:pointer; display:inline-flex; align-items:center; gap:8px; font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:14px; letter-spacing:0.3px; color:#4fd6a0; border:2px solid #1f6f7c; background:#0a1622; padding:12px 22px; box-shadow:4px 4px 0 rgba(0,0,0,0.5);">ver todos los registros &#9656;</button>' +
+  // Una celda del mes. Los miércoles de clases son <button> (abren la ficha de
+  // la reunión); el resto son <span>, para que el tabulador no pare en ellos.
+  function dayCell(d) {
+    var iso = toISO(d);
+    var hoy = toISO(new Date()) === iso;
+    var enClases = CAL_START && CAL_END && d >= CAL_START && d <= CAL_END;
+    var mi = meetIdx[iso];
+    var hito = HITOS[iso];
+    var esReunion = mi != null;
+
+    var fg = '#33505c', bg = 'transparent', bd = '1px solid transparent', extra = '';
+    if (enClases) { fg = '#cfe8ec'; bg = '#0c2029'; bd = '1px solid #16404d'; }
+    if (esReunion) {
+      fg = '#4fd6a0'; bg = '#082019'; bd = '2px solid #4fd6a0';
+      extra = 'box-shadow:0 0 10px rgba(79,214,160,0.22); font-weight:700;';
+    }
+    if (hito) {
+      fg = hito.accent; bd = '2px solid ' + hito.accent;
+      extra = 'box-shadow:0 0 12px ' + glowFor(hito.accent) + '; font-weight:700;';
+    }
+    if (hoy) extra += ' outline:1px dashed #5c7a86; outline-offset:2px;';
+
+    var style = 'position:relative; display:grid; place-items:center; height:' + CELDA + 'px; margin:0; padding:0; ' +
+      'font-family:\'JetBrains Mono\',monospace; font-size:15px; color:' + fg + '; background:' + bg +
+      '; border:' + bd + '; ' + extra;
+
+    var punto = esReunion
+      ? '<i style="position:absolute; bottom:5px; left:50%; transform:translateX(-50%); width:5px; height:5px; background:' + (hito ? hito.accent : '#4fd6a0') + '; border-radius:50%;"></i>'
+      : '';
+
+    if (esReunion) {
+      return '<button class="calcell calday" data-meet="' + mi + '" title="' + esc(cal.meetingTitle || 'Reunión') + ' · ' + esc(fechaLarga(d)) + '" ' +
+        'style="cursor:pointer; transition:transform .1s, box-shadow .1s; ' + style + '">' + d.getDate() + punto + '</button>';
+    }
+    return '<span class="calcell"' + (hito ? ' title="' + esc(hito.label) + '"' : '') + ' style="' + style + '">' + d.getDate() + '</span>';
+  }
+
+  // El calendario se ve de mes en mes: esta es la lista por la que se navega,
+  // de punta a punta de la época de clases.
+  var CAL_MESES = (function () {
+    var out = [];
+    if (!CAL_START || !CAL_END) return out;
+    var y = CAL_START.getFullYear(), m = CAL_START.getMonth();
+    var yFin = CAL_END.getFullYear(), mFin = CAL_END.getMonth();
+    while (y < yFin || (y === yFin && m <= mFin)) {
+      out.push({ y: y, m: m });
+      m++; if (m > 11) { m = 0; y++; }
+    }
+    return out;
+  })();
+
+  // Se abre en el mes en curso si cae dentro; si no, en el primero.
+  var mesIdx = (function () {
+    var hoy = new Date(), i;
+    for (i = 0; i < CAL_MESES.length; i++) {
+      if (CAL_MESES[i].y === hoy.getFullYear() && CAL_MESES[i].m === hoy.getMonth()) return i;
+    }
+    return 0;
+  })();
+
+  function monthHtml(i) {
+    var y = CAL_MESES[i].y, m = CAL_MESES[i].m;
+    var hueco = wdIdx(new Date(y, m, 1));
+    var total = new Date(y, m + 1, 0).getDate();
+    var celdas = '', k, d, cuantas = 0;
+
+    for (k = 0; k < hueco; k++) celdas += '<span class="calcell" style="height:' + CELDA + 'px;"></span>';
+    for (k = 1; k <= total; k++) {
+      d = new Date(y, m, k);
+      if (meetIdx[toISO(d)] != null) cuantas++;
+      celdas += dayCell(d);
+    }
+
+    var iniciales = DIAS_INI.map(function (l, j) {
+      return '<span style="display:grid; place-items:center; height:24px; font-family:\'JetBrains Mono\',monospace; font-size:12px; letter-spacing:0.5px; color:' + (j === MEET_WD ? '#4fd6a0' : '#5c7a86') + ';">' + l + '</span>';
+    }).join('');
+
+    var flecha = function (id, glifo, apagado, etiqueta) {
+      return '<button id="' + id + '" aria-label="' + etiqueta + '"' + (apagado ? ' disabled' : '') +
+        ' style="cursor:' + (apagado ? 'default' : 'pointer') + '; font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:14px; ' +
+        'color:' + (apagado ? '#1f4b54' : '#29c5d6') + '; background:transparent; border:2px solid ' + (apagado ? '#12303c' : '#29c5d6') + '; padding:4px 11px;">' + glifo + '</button>';
+    };
+
+    return '' +
+    '<div style="background:#070f18; border:2px solid #173241; box-shadow:6px 6px 0 rgba(0,0,0,0.5);">' +
+      '<div style="display:flex; align-items:center; gap:12px; padding:11px 14px; background:#0a1622; border-bottom:2px solid #16404d;">' +
+        flecha('calPrev', '&#9666;', i === 0, 'mes anterior') +
+        '<span style="flex:1; text-align:center; font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:16px; color:#cfe8ec;">' + MESES[m] + ' <span style="color:#5c7a86; font-weight:400;">' + y + '</span></span>' +
+        flecha('calNext', '&#9656;', i === CAL_MESES.length - 1, 'mes siguiente') +
+      '</div>' +
+      '<div class="calcuerpo" style="padding:12px 14px 16px;">' +
+        '<div class="calrejilla" style="display:grid; grid-template-columns:repeat(7,1fr); gap:5px; margin-bottom:5px;">' + iniciales + '</div>' +
+        '<div class="calrejilla" style="display:grid; grid-template-columns:repeat(7,1fr); gap:5px;">' + celdas + '</div>' +
+      '</div>' +
+      '<div style="padding:10px 14px; border-top:2px solid #16404d; background:#0a1622; font-family:\'JetBrains Mono\',monospace; font-size:12px; color:' + (cuantas ? '#4fd6a0' : '#5c7a86') + ';">' +
+        (cuantas ? cuantas + ' reuni' + (cuantas === 1 ? 'ón' : 'ones') + ' este mes' : 'sin reuniones este mes') +
       '</div>' +
     '</div>';
-    $('groupsMount').innerHTML = html;
-    Array.prototype.forEach.call(document.querySelectorAll('.bcard'), function (b) {
-      b.addEventListener('click', function () { openNews(parseInt(b.getAttribute('data-news'), 10)); });
-    });
-    $('verRegistros').addEventListener('click', openArchive);
   }
 
-  /* ---------- ARCHIVO (todos los registros) ---------- */
-  function openArchive() {
-    var rows = news.map(function (n, i) {
-      var color = n.accent;
+  // Repinta solo el mes: el resto de la sección se queda como está.
+  function pintarMes() {
+    var caja = $('calMes');
+    if (!caja) return;
+    caja.innerHTML = monthHtml(mesIdx);
+    Array.prototype.forEach.call(caja.querySelectorAll('.calday'), function (b) {
+      b.addEventListener('click', function () { openMeeting(parseInt(b.getAttribute('data-meet'), 10)); });
+    });
+    $('calPrev').addEventListener('click', function () { if (mesIdx > 0) { mesIdx--; pintarMes(); } });
+    $('calNext').addEventListener('click', function () { if (mesIdx < CAL_MESES.length - 1) { mesIdx++; pintarMes(); } });
+  }
+
+  function renderCalendar() {
+    var mount = $('calendarMount');
+    if (!mount) return;
+    if (!CAL_MESES.length) { mount.innerHTML = ''; return; }
+
+    // Las fechas marcadas entran en la propia leyenda, cada una con su color y
+    // su día, en vez de repetirse aparte.
+    var hitos = Object.keys(HITOS).sort().map(function (iso) {
+      var h = HITOS[iso], d = parseISO(iso);
+      return legendItem(h.accent, '&#9670;', fechaCorta(d) + ' · ' + h.label.toLowerCase(), 'transparent');
+    }).join('');
+
+    mount.innerHTML = '' +
+    '<div id="calendario" style="scroll-margin-top:72px;">' +
+      '<div style="font-family:\'JetBrains Mono\',monospace; font-size:16px; color:#1f8fa0; margin-bottom:6px;">aperture@lab:~$ <span style="color:#cfe8ec;">cat ./calendario.ics</span></div>' +
+      '<h3 style="font-family:\'Press Start 2P\'; font-size:clamp(13px,2.4vw,20px); color:#29c5d6; margin:0 0 10px;">' + esc(cal.title || 'CALENDARIO') + '</h3>' +
+      '<p style="font-size:24px; color:#7fa2ac; margin:0 0 18px; font-family:\'VT323\',monospace;">' + esc(cal.text || '') + '</p>' +
+
+      // El mes manda a la izquierda; a su lado, lo que antes lo empujaba
+      // hacia abajo: leyenda, fechas marcadas y el acceso al listado.
+      '<div class="calgrid">' +
+        '<div id="calMes"></div>' +
+        '<aside style="display:flex; flex-direction:column; gap:18px;">' +
+          '<div style="display:flex; flex-direction:column; gap:11px;">' +
+            legendItem('#16404d', '', 'época de clases', '#0c2029') +
+            legendItem('#4fd6a0', '&#9679;', 'reunión', '#082019') +
+            hitos +
+          '</div>' +
+          '<button class="alllink" id="verReuniones" style="cursor:pointer; align-self:flex-start; display:inline-flex; align-items:center; gap:8px; font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:14px; letter-spacing:0.3px; color:#4fd6a0; border:2px solid #1f6f7c; background:#0a1622; padding:12px 20px; box-shadow:4px 4px 0 rgba(0,0,0,0.5);">ver todas las reuniones &#9656;</button>' +
+        '</aside>' +
+      '</div>' +
+    '</div>';
+
+    pintarMes();
+    $('verReuniones').addEventListener('click', openMeetingList);
+  }
+
+  /* ---------- LISTA DE REUNIONES ---------- */
+  function openMeetingList() {
+    var pendientes = meetings.filter(function (r) { return !r.planned; }).length;
+    var rows = meetings.map(function (r, i) {
+      var color = r.planned ? '#4fd6a0' : '#5c7a86';
       return '' +
-      '<button class="arcrow" data-news="' + i + '" style="cursor:pointer; text-align:left; width:100%; display:flex; align-items:center; gap:14px; flex-wrap:wrap; background:#070f18; border:2px solid #173241; border-left:6px solid ' + color + '; box-shadow:4px 4px 0 rgba(0,0,0,0.5); padding:14px 16px; transition:transform .1s, box-shadow .1s;">' +
-        '<span style="font-family:\'JetBrains Mono\',monospace; font-size:11px; font-weight:700; color:#050a0e; background:' + color + '; padding:3px 9px;">' + esc(n.tag) + '</span>' +
-        '<span style="flex:1 1 220px; min-width:0; font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:18px; color:#fff;">' + esc(n.title) + '</span>' +
-        '<span style="font-family:\'JetBrains Mono\',monospace; font-size:12px; color:' + color + '; border:1px solid ' + color + '; padding:2px 8px; white-space:nowrap;">' + esc(n.date) + '</span>' +
+      '<button class="arcrow" data-meet="' + i + '" style="cursor:pointer; text-align:left; width:100%; display:flex; align-items:center; gap:14px; flex-wrap:wrap; background:#070f18; border:2px solid #173241; border-left:6px solid ' + color + '; box-shadow:4px 4px 0 rgba(0,0,0,0.5); padding:14px 16px; transition:transform .1s, box-shadow .1s;">' +
+        '<span style="font-family:\'JetBrains Mono\',monospace; font-size:11px; font-weight:700; color:#050a0e; background:' + color + '; padding:3px 9px; white-space:nowrap;">' + esc(fechaCorta(r.date)) + '</span>' +
+        '<span style="flex:1 1 220px; min-width:0; font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:17px; color:' + (r.planned ? '#fff' : '#9fc4cd') + ';">' + esc(r.planned ? r.title : 'Tema por definir') + '</span>' +
+        '<span style="font-family:\'JetBrains Mono\',monospace; font-size:12px; color:#5c7a86; white-space:nowrap;">' + esc(DIAS[wdIdx(r.date)]) + '</span>' +
         '<span style="font-family:\'JetBrains Mono\',monospace; font-size:13px; font-weight:700; color:' + color + '; white-space:nowrap;">abrir &#9656;</span>' +
       '</button>';
     }).join('');
-    var html = '' +
-    '<div id="arcOverlay" style="position:fixed; inset:0; z-index:150; background:rgba(3,7,12,0.88); display:flex; align-items:flex-start; justify-content:center; padding:42px 18px; overflow-y:auto;">' +
-      '<div id="arcCard" style="width:100%; max-width:760px; background:#0a1622; border:3px solid #29c5d6; box-shadow:10px 10px 0 rgba(0,0,0,0.55), 0 0 32px rgba(41,197,214,0.2); animation:popIn .2s ease;">' +
-        '<div style="display:flex; gap:6px; align-items:center; padding:10px 14px; background:#070f18; border-bottom:2px solid #29c5d6;">' +
-          '<span style="width:11px;height:11px;background:#157a87;border-radius:50%;"></span>' +
-          '<span style="width:11px;height:11px;background:#1f8fa0;border-radius:50%;"></span>' +
-          '<span style="width:11px;height:11px;background:#29c5d6;border-radius:50%;"></span>' +
-          '<span style="font-size:14px; color:#5c7a86; margin-left:8px; font-family:\'JetBrains Mono\',monospace; flex:1;">aperture@lab:~$ ls ./bitacora/</span>' +
-          '<button id="arcClose" style="cursor:pointer; background:transparent; border:2px solid #29c5d6; color:#29c5d6; font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:13px; padding:3px 9px;">[ x ]</button>' +
-        '</div>' +
-        '<div style="padding:22px 24px;">' +
-          '<h3 style="font-family:\'Press Start 2P\'; font-size:clamp(13px,2.4vw,18px); color:#29c5d6; margin:0 0 6px;">REGISTROS</h3>' +
-          '<p style="font-size:20px; color:#7fa2ac; margin:0 0 18px; font-family:\'VT323\',monospace;">' + news.length + ' entradas en la bitácora del semillero.</p>' +
-          '<div style="display:flex; flex-direction:column; gap:12px;">' + rows + '</div>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
-    $('newsMount').innerHTML = html;
-    $('arcOverlay').addEventListener('click', closeNews);
-    $('arcCard').addEventListener('click', function (e) { e.stopPropagation(); });
-    $('arcClose').addEventListener('click', closeNews);
+
+    openOverlay('#29c5d6', 'aperture@lab:~$ ls ./reuniones/', '760px',
+      '<h3 style="font-family:\'Press Start 2P\'; font-size:clamp(13px,2.4vw,18px); color:#29c5d6; margin:0 0 6px;">REUNIONES</h3>' +
+      '<p style="font-size:20px; color:#7fa2ac; margin:0 0 18px; font-family:\'VT323\',monospace;">' +
+        meetings.length + ' ' + DIAS[MEET_WD] + 's dentro de la época de clases · ' + pendientes + ' con el tema todavía por definir.</p>' +
+      '<div style="display:flex; flex-direction:column; gap:12px;">' + rows + '</div>');
+
     Array.prototype.forEach.call(document.querySelectorAll('.arcrow'), function (r) {
-      r.addEventListener('click', function () { openNews(parseInt(r.getAttribute('data-news'), 10)); });
+      r.addEventListener('click', function () { openMeeting(parseInt(r.getAttribute('data-meet'), 10)); });
     });
   }
+
+  /* ---------- CÓMO SE ENTRA ----------
+     Va justo antes de las líneas: primero se dice que se puede entrar sin
+     saber, y solo después de qué va cada línea. */
+  function renderAccess() {
+    var mount = $('accessMount');
+    if (!mount || !access.length) return;
+
+    var tarjetas = access.map(function (p) {
+      return '' +
+      '<div style="--glow:' + p.glow + '; background:#070f18; border:2px solid #173241; border-top:4px solid ' + p.accent + '; box-shadow:6px 6px 0 rgba(0,0,0,0.5); padding:18px 20px;">' +
+        '<div style="font-family:\'Press Start 2P\'; font-size:13px; color:' + p.accent + '; margin-bottom:12px;">' + esc(p.num) + '</div>' +
+        '<div style="font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:16px; color:#fff; margin-bottom:8px;">' + esc(p.title) + '</div>' +
+        '<div style="font-size:20px; line-height:1.3; color:#9fc4cd; font-family:\'VT323\',monospace;">' + esc(p.text) + '</div>' +
+      '</div>';
+    }).join('');
+
+    mount.innerHTML = '' +
+    '<div id="acceso" style="scroll-margin-top:72px;">' +
+      '<div style="font-family:\'JetBrains Mono\',monospace; font-size:16px; color:#1f8fa0; margin-bottom:6px;">aperture@lab:~$ <span style="color:#cfe8ec;">./requisitos.sh</span></div>' +
+      '<h3 style="font-family:\'Press Start 2P\'; font-size:clamp(13px,2.4vw,20px); color:#29c5d6; margin:0 0 14px;">' + esc(site.accessTitle || '') + '</h3>' +
+      '<p style="font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:clamp(17px,2.6vw,23px); line-height:1.4; color:#fff; margin:0 0 22px; max-width:760px;">' +
+        '<span style="color:#4fd6a0;">&gt;</span> ' + esc(site.accessPhrase || '') + '</p>' +
+      // min(...,100%) para que en pantallas muy angostas la columna se
+      // encoja en vez de desbordar el ancho de la página.
+      '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(258px,100%),1fr)); gap:16px;">' + tarjetas + '</div>' +
+    '</div>';
+  }
+
+  /* ---------- LÍNEAS DE ESTUDIO ---------- */
+  /* Las tres tarjetas, cada una con su animación (ver VITRINAS abajo) y su
+     ficha: nombre oficial, una frase y tres temas con su diagrama. Los datos
+     salen del reporte del semillero en HERMES (ID 8004), apartado «Enfoque». */
+
+  function lineCard(l) {
+    return '' +
+    '<button class="linea" data-line="' + esc(l.key) + '" style="--glow:' + l.glow + '; --acento:' + l.accent + '; cursor:pointer; text-align:left; padding:0 0 16px; background:#070f18; border:2px solid #173241; box-shadow:6px 6px 0 rgba(0,0,0,0.5); overflow:hidden; transition:transform .14s, box-shadow .14s, border-color .14s;">' +
+      '<span class="viz" data-viz="' + esc(l.key) + '" aria-hidden="true" style="display:block; border-bottom:2px solid ' + l.accent + '; background:#04080c;"></span>' +
+      '<b style="display:block; margin:14px 16px 6px; font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:16px; color:' + l.accent + ';">' + esc(l.name) + '</b>' +
+      '<span style="display:block; margin:0 16px 10px; font-size:20px; line-height:1.25; color:#9fc4cd; font-family:\'VT323\',monospace;">' + esc(l.summary) + '</span>' +
+      '<span style="display:block; margin:0 16px; font-family:\'JetBrains Mono\',monospace; font-size:12px; font-weight:700; color:' + l.accent + ';">ver la l&iacute;nea &#9656;</span>' +
+    '</button>';
+  }
+
+  function renderLines() {
+    var mount = $('linesMount');
+    if (!mount || !studyLines.length) return;
+    mount.innerHTML = '' +
+    '<div id="lineas" style="scroll-margin-top:72px;">' +
+      '<div style="font-family:\'JetBrains Mono\',monospace; font-size:16px; color:#1f8fa0; margin-bottom:6px;">aperture@lab:~$ <span style="color:#cfe8ec;">ls ./lineas/</span></div>' +
+      '<h3 style="font-family:\'Press Start 2P\'; font-size:clamp(13px,2.4vw,20px); color:#29c5d6; margin:0 0 10px;">' + esc(site.linesTitle || 'LÍNEAS DE ESTUDIO') + '</h3>' +
+      '<p style="font-size:24px; color:#7fa2ac; margin:0 0 18px; font-family:\'VT323\',monospace;">' + esc(site.linesText || '') + '</p>' +
+      '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(288px,100%),1fr)); gap:16px;">' + studyLines.map(lineCard).join('') + '</div>' +
+    '</div>';
+
+    Array.prototype.forEach.call(mount.querySelectorAll('.linea'), function (b) {
+      b.addEventListener('click', function () { openLine(b.getAttribute('data-line')); });
+    });
+    mountVitrinas(mount);
+  }
+
+  /* ---------- VITRINAS (una animación por línea) ----------
+     Tres SVG montados aquí para no llenar el HTML de nodos repetidos; el
+     movimiento lo pone el CSS (css/styles.css, sección «vitrinas»).
+       ds   una recta que baja hasta ajustar la nube, y los residuos
+       ia   una red 2-4-4-2 recorrida capa a capa por una onda
+       hpc  tres chips con la matriz de núcleos del die encendiéndose  */
+
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  var VIZ_W = 120, VIZ_H = 52;
+
+  function svgEl(name, attrs) {
+    var el = document.createElementNS(SVGNS, name);
+    for (var k in attrs) if (Object.prototype.hasOwnProperty.call(attrs, k)) el.setAttribute(k, String(attrs[k]));
+    return el;
+  }
+  function lienzo() { return svgEl('svg', { viewBox: '0 0 ' + VIZ_W + ' ' + VIZ_H }); }
+
+  function vitrinaDS() {
+    var svg = lienzo();
+    var PUNTOS = [[16,39],[25,41],[34,34],[43,33],[51,28],[60,30],[69,22],[78,21],[88,15],[99,13],[107,10]];
+    var X1 = 12, Y1 = 43, X2 = 111, Y2 = 9;
+    var pend = (Y2 - Y1) / (X2 - X1);
+    function enLaRecta(x) { return Y1 + pend * (x - X1); }
+
+    svg.appendChild(svgEl('line', { 'class': 'eje', x1: 9, y1: 47, x2: 115, y2: 47 }));
+    svg.appendChild(svgEl('line', { 'class': 'eje', x1: 9, y1: 47, x2: 9, y2: 5 }));
+    PUNTOS.forEach(function (p) {
+      svg.appendChild(svgEl('line', { 'class': 'residuo', x1: p[0], y1: p[1], x2: p[0], y2: enLaRecta(p[0]) }));
+    });
+    svg.appendChild(svgEl('line', { 'class': 'ajuste', x1: X1, y1: Y1, x2: X2, y2: Y2 }));
+    PUNTOS.forEach(function (p, i) {
+      var c = svgEl('circle', { 'class': 'punto', cx: p[0], cy: p[1], r: 2.5 });
+      c.style.animationDelay = (i * 0.09) + 's';
+      svg.appendChild(c);
+    });
+    return svg;
+  }
+
+  function vitrinaIA() {
+    var svg = lienzo();
+    var CAPAS = [2, 4, 4, 2], X = [12, 44, 76, 108], SEP = 11.5, RADIO = 4.2, PASO = 0.5;
+    var capas = CAPAS.map(function (n, c) {
+      var ys = [];
+      for (var i = 0; i < n; i++) ys.push([X[c], VIZ_H / 2 + (i - (n - 1) / 2) * SEP]);
+      return ys;
+    });
+    // Las conexiones van primero, para que los nodos queden por encima.
+    capas.slice(0, -1).forEach(function (capa, c) {
+      capa.forEach(function (a) {
+        capas[c + 1].forEach(function (b) {
+          var s = svgEl('line', { 'class': 'sinapsis', x1: a[0], y1: a[1], x2: b[0], y2: b[1] });
+          s.style.animationDelay = (c * PASO + 0.15).toFixed(2) + 's';
+          svg.appendChild(s);
+        });
+      });
+    });
+    capas.forEach(function (capa, c) {
+      capa.forEach(function (p) {
+        var n = svgEl('circle', { 'class': 'neurona', cx: p[0], cy: p[1], r: RADIO });
+        n.style.animationDelay = (c * PASO).toFixed(2) + 's';
+        svg.appendChild(n);
+      });
+    });
+    return svg;
+  }
+
+  function vitrinaHPC() {
+    var svg = lienzo();
+    var CHIPS = 3, LADO = 30, HUECO = 9, PATAS = 4, LARGO = 4;
+    var REJILLA = 3, NUCLEO = 4, SEP = 1;
+    var y0 = (VIZ_H - LADO) / 2;
+    var x0 = (VIZ_W - (CHIPS * LADO + (CHIPS - 1) * HUECO)) / 2;
+
+    for (var n = 0; n < CHIPS; n++) {
+      var x = x0 + n * (LADO + HUECO);
+      for (var p = 0; p < PATAS; p++) {
+        var desp = 6 + p * 6;
+        svg.appendChild(svgEl('line', { 'class': 'pata', x1: x - LARGO, y1: y0 + desp, x2: x, y2: y0 + desp }));
+        svg.appendChild(svgEl('line', { 'class': 'pata', x1: x + LADO, y1: y0 + desp, x2: x + LADO + LARGO, y2: y0 + desp }));
+        svg.appendChild(svgEl('line', { 'class': 'pata', x1: x + desp, y1: y0 - LARGO, x2: x + desp, y2: y0 }));
+        svg.appendChild(svgEl('line', { 'class': 'pata', x1: x + desp, y1: y0 + LADO, x2: x + desp, y2: y0 + LADO + LARGO }));
+      }
+      svg.appendChild(svgEl('rect', { 'class': 'encapsulado', x: x, y: y0, width: LADO, height: LADO }));
+
+      var die = REJILLA * NUCLEO + (REJILLA - 1) * SEP;
+      var dieX = x + (LADO - die) / 2, dieY = y0 + (LADO - die) / 2;
+      svg.appendChild(svgEl('rect', { 'class': 'dado', x: dieX - 2, y: dieY - 2, width: die + 4, height: die + 4 }));
+
+      for (var f = 0; f < REJILLA; f++) {
+        for (var c = 0; c < REJILLA; c++) {
+          var nu = svgEl('rect', {
+            'class': 'nucleo',
+            x: dieX + c * (NUCLEO + SEP), y: dieY + f * (NUCLEO + SEP),
+            width: NUCLEO, height: NUCLEO
+          });
+          nu.style.animationDelay = (n * 0.3 + (f + c) * 0.13) + 's';
+          svg.appendChild(nu);
+        }
+      }
+    }
+    return svg;
+  }
+
+  var VITRINAS = { ds: vitrinaDS, ia: vitrinaIA, hpc: vitrinaHPC };
+
+  function mountVitrinas(root) {
+    Array.prototype.forEach.call((root || document).querySelectorAll('.viz[data-viz]'), function (caja) {
+      var f = VITRINAS[caja.getAttribute('data-viz')];
+      // SVG nuevo en cada montaje: así la animación arranca desde el principio.
+      caja.innerHTML = '';
+      if (f) caja.appendChild(f());
+    });
+  }
+
+  /* ---------- DIAGRAMAS DE LOS TEMAS ----------
+     Dibujos fijos de 44×26 que toman el color de acento de su línea.
+       lleno        la pieza va maciza en vez de solo con trazo
+       tenue        maciza pero al fondo, para lo que acompaña sin competir  */
+  var DIAGRAMAS = {
+    histograma:
+      '<rect class="tenue" x="4" y="16" width="6" height="6.5"/>' +
+      '<rect class="tenue" x="11.5" y="12" width="6" height="10.5"/>' +
+      '<rect class="tenue" x="19" y="8" width="6" height="14.5"/>' +
+      '<rect class="tenue" x="26.5" y="12.5" width="6" height="10"/>' +
+      '<rect class="tenue" x="34" y="17" width="6" height="5.5"/>' +
+      '<line x1="2.5" y1="22.5" x2="41.5" y2="22.5"/>' +
+      '<path d="M3 21.5 Q22 -8 41 21.5"/>',
+    frontera:
+      '<line class="guion" x1="4" y1="22" x2="40" y2="4"/>' +
+      '<circle cx="10" cy="8" r="2.3"/><circle cx="17.5" cy="5" r="2.3"/><circle cx="13" cy="14" r="2.3"/>' +
+      '<rect class="lleno" x="25.5" y="18" width="4.4" height="4.4"/>' +
+      '<rect class="lleno" x="32.5" y="15" width="4.4" height="4.4"/>' +
+      '<rect class="lleno" x="28" y="11" width="4.4" height="4.4"/>',
+    despliegue:
+      '<rect x="2" y="8" width="13" height="10"/><circle class="lleno" cx="8.5" cy="13" r="2.4"/>' +
+      '<line x1="17" y1="13" x2="23" y2="13"/><polyline points="21,11 23,13 21,15"/>' +
+      '<rect x="26" y="4" width="16" height="5"/><rect x="26" y="10.5" width="16" height="5"/><rect x="26" y="17" width="16" height="5"/>' +
+      '<circle class="lleno" cx="29" cy="6.5" r="1"/><circle class="lleno" cx="29" cy="13" r="1"/><circle class="lleno" cx="29" cy="19.5" r="1"/>',
+    capas:
+      '<line x1="1.5" y1="13" x2="7" y2="13"/><polyline points="5,11 7,13 5,15"/>' +
+      '<rect x="9" y="3.5" width="26" height="5.5"/><rect x="9" y="10.5" width="26" height="5.5"/><rect x="9" y="17.5" width="26" height="5.5"/>' +
+      '<line class="tenue-trazo" x1="22" y1="9" x2="22" y2="10.5"/><line class="tenue-trazo" x1="22" y1="16" x2="22" y2="17.5"/>' +
+      '<line x1="37" y1="13" x2="42.5" y2="13"/><polyline points="40.5,11 42.5,13 40.5,15"/>',
+    bucle:
+      '<line class="tenue-trazo" x1="20" y1="13" x2="20" y2="6"/>' +
+      '<line class="tenue-trazo" x1="20" y1="13" x2="14" y2="19"/>' +
+      '<line class="tenue-trazo" x1="20" y1="13" x2="26" y2="19"/>' +
+      '<rect class="lleno" x="17.7" y="2.4" width="4.6" height="4.6"/>' +
+      '<rect class="lleno" x="11.7" y="17.4" width="4.6" height="4.6"/>' +
+      '<rect class="lleno" x="23.7" y="17.4" width="4.6" height="4.6"/>' +
+      '<circle class="lleno" cx="20" cy="13" r="3.6"/>' +
+      '<path d="M32 4.5 A 12.5 12.5 0 0 1 32 21.5"/><polyline points="34.6,19.2 31.6,21.8 30.9,18"/>',
+    recuperar:
+      '<rect class="tenue" x="2" y="4" width="9" height="13"/><rect x="5.5" y="7" width="9" height="13"/>' +
+      '<line x1="7.5" y1="11.5" x2="12.5" y2="11.5"/><line x1="7.5" y1="15" x2="11" y2="15"/>' +
+      '<line x1="17" y1="13" x2="23" y2="13"/><polyline points="21,11 23,13 21,15"/>' +
+      '<line x1="27.5" y1="6" x2="33.5" y2="13.5"/><line x1="41" y1="8" x2="33.5" y2="13.5"/><line x1="38" y1="21" x2="33.5" y2="13.5"/>' +
+      '<circle class="lleno" cx="27.5" cy="6" r="2.2"/><circle class="lleno" cx="41" cy="8" r="2.2"/>' +
+      '<circle class="lleno" cx="38" cy="21" r="2.2"/><circle class="lleno" cx="33.5" cy="13.5" r="2.8"/>',
+    chip:
+      '<line x1="7" y1="9" x2="11" y2="9"/><line x1="7" y1="13" x2="11" y2="13"/><line x1="7" y1="17" x2="11" y2="17"/>' +
+      '<line x1="33" y1="9" x2="37" y2="9"/><line x1="33" y1="13" x2="37" y2="13"/><line x1="33" y1="17" x2="37" y2="17"/>' +
+      '<line x1="16" y1="1.5" x2="16" y2="5"/><line x1="22" y1="1.5" x2="22" y2="5"/><line x1="28" y1="1.5" x2="28" y2="5"/>' +
+      '<line x1="16" y1="21" x2="16" y2="24.5"/><line x1="22" y1="21" x2="22" y2="24.5"/><line x1="28" y1="21" x2="28" y2="24.5"/>' +
+      '<rect x="11" y="5" width="22" height="16"/><rect x="16" y="9" width="12" height="8"/>' +
+      '<line class="tenue-trazo" x1="20" y1="9" x2="20" y2="17"/><line class="tenue-trazo" x1="24" y1="9" x2="24" y2="17"/>' +
+      '<line class="tenue-trazo" x1="16" y1="13" x2="28" y2="13"/>',
+    reparto:
+      '<path d="M6.5 13 C10 13 11 5 14 5"/><path d="M6.5 13 H14"/><path d="M6.5 13 C10 13 11 21 14 21"/>' +
+      '<path d="M30 5 C33 5 34 13 37.5 13"/><path d="M30 13 H37.5"/><path d="M30 21 C33 21 34 13 37.5 13"/>' +
+      '<line class="tenue-trazo" x1="14" y1="5" x2="30" y2="5"/><line class="tenue-trazo" x1="14" y1="13" x2="30" y2="13"/>' +
+      '<line class="tenue-trazo" x1="14" y1="21" x2="30" y2="21"/>' +
+      '<rect class="lleno" x="16" y="3.4" width="3.6" height="3.2"/><rect class="lleno" x="22" y="11.4" width="3.6" height="3.2"/>' +
+      '<rect class="lleno" x="26" y="19.4" width="3.6" height="3.2"/>' +
+      '<circle class="lleno" cx="4" cy="13" r="2.6"/><circle class="lleno" cx="40" cy="13" r="2.6"/>',
+    ciclo:
+      '<rect x="3" y="3.5" width="10" height="9"/><rect x="17" y="3.5" width="10" height="9"/><rect x="31" y="3.5" width="10" height="9"/>' +
+      '<line x1="13" y1="8" x2="17" y2="8"/><polyline points="15.4,6.4 17,8 15.4,9.6"/>' +
+      '<line x1="27" y1="8" x2="31" y2="8"/><polyline points="29.4,6.4 31,8 29.4,9.6"/>' +
+      '<path class="guion" d="M36 12.5 V20 H8 V13.8"/><polyline points="6.4,15.4 8,13.8 9.6,15.4"/>'
+  };
 
   /* ---------- SOCIALS ---------- */
   function renderSocials() {
@@ -140,59 +539,77 @@
     }).join('');
   }
 
-  /* ---------- CHART (barras horizontales) ---------- */
-  function chartHtml(chart, color) {
-    if (!chart || !chart.length) return '';
-    var max = chart.reduce(function (m, r) { return Math.max(m, r.count); }, 0) || 1;
-    var rows = chart.map(function (r) {
-      var w = Math.round((r.count / max) * 100);
-      return '' +
-      '<div style="margin-bottom:13px;">' +
-        '<div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-bottom:4px;">' +
-          '<span style="font-family:\'JetBrains Mono\',monospace; font-size:13px; color:#cfe8ec; line-height:1.25;">' + esc(r.label) + '</span>' +
-          '<span style="flex:none; font-family:\'JetBrains Mono\',monospace; font-size:12px; font-weight:700; color:' + color + ';">' + r.count + ' · ' + r.pct + '%</span>' +
-        '</div>' +
-        '<div style="height:11px; background:#0a1622; border:1px solid #173241;">' +
-          '<div style="height:100%; width:' + w + '%; background:' + color + '; box-shadow:0 0 10px ' + glowFor(color) + ';"></div>' +
-        '</div>' +
-      '</div>';
-    }).join('');
-    return '<div style="margin:4px 0 22px;">' + rows + '</div>';
-  }
-
-  /* ---------- NEWS MODAL ---------- */
-  function openNews(i) {
-    var n = news[i] || news[0];
-    var color = n.accent;
-    var html = '' +
-    '<div id="newsOverlay" style="position:fixed; inset:0; z-index:150; background:rgba(3,7,12,0.85); display:flex; align-items:flex-start; justify-content:center; padding:42px 18px; overflow-y:auto;">' +
-      '<div id="newsCard" style="width:100%; max-width:680px; background:#0a1622; border:3px solid ' + color + '; box-shadow:10px 10px 0 rgba(0,0,0,0.55), 0 0 32px rgba(51,201,214,0.2); animation:popIn .2s ease;">' +
+  /* ---------- MODALES ----------
+     Un solo armazón (ventana de terminal sobre el fondo oscurecido) que
+     reutilizan la reunión, la lista de reuniones y la ficha de línea. */
+  function openOverlay(color, meta, ancho, cuerpo) {
+    $('modalMount').innerHTML = '' +
+    '<div id="ovBack" class="ovback" style="position:fixed; inset:0; z-index:150; background:rgba(3,7,12,0.86); display:flex; align-items:flex-start; justify-content:center; padding:42px 18px; overflow-y:auto;">' +
+      '<div id="ovCard" style="width:100%; max-width:' + ancho + '; background:#0a1622; border:3px solid ' + color + '; box-shadow:10px 10px 0 rgba(0,0,0,0.55), 0 0 32px ' + glowFor(color) + '; animation:popIn .2s ease;">' +
         '<div style="display:flex; gap:6px; align-items:center; padding:10px 14px; background:#070f18; border-bottom:2px solid ' + color + ';">' +
           '<span style="width:11px;height:11px;background:#157a87;border-radius:50%;"></span>' +
           '<span style="width:11px;height:11px;background:#1f8fa0;border-radius:50%;"></span>' +
           '<span style="width:11px;height:11px;background:' + color + ';border-radius:50%;"></span>' +
-          '<span style="font-size:14px; color:#5c7a86; margin-left:8px; font-family:\'JetBrains Mono\',monospace; flex:1;">' + esc(n.meta) + '</span>' +
-          '<button id="newsClose" style="cursor:pointer; background:transparent; border:2px solid ' + color + '; color:' + color + '; font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:13px; padding:3px 9px;">[ x ]</button>' +
+          '<span style="font-size:14px; color:#5c7a86; margin-left:8px; font-family:\'JetBrains Mono\',monospace; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + esc(meta) + '</span>' +
+          '<button id="ovClose" aria-label="cerrar" style="cursor:pointer; background:transparent; border:2px solid ' + color + '; color:' + color + '; font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:13px; padding:3px 9px;">[ x ]</button>' +
         '</div>' +
-        '<div style="padding:24px 26px;">' +
-          '<div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:16px;">' +
-            '<span style="font-family:\'JetBrains Mono\',monospace; font-size:12px; font-weight:700; color:#050a0e; background:' + color + '; padding:3px 9px;">' + esc(n.tag) + '</span>' +
-            '<span style="font-family:\'JetBrains Mono\',monospace; font-size:12px; color:' + color + '; border:1px solid ' + color + '; padding:2px 8px;">' + esc(n.date) + '</span>' +
-          '</div>' +
-          '<div style="font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:clamp(20px,3vw,26px); color:#fff; line-height:1.25; margin-bottom:16px;">' + esc(n.title) + '</div>' +
-          '<p style="font-size:22px; line-height:1.45; color:#cfe8ec; margin:0 0 22px; font-family:\'VT323\',monospace;">' + esc(n.text) + '</p>' +
-          chartHtml(n.chart, color) +
-          (n.link ?
-            '<a href="' + n.link.url + '" target="_blank" rel="noopener" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px; font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:14px; color:#050a0e; background:' + color + '; padding:10px 16px; box-shadow:4px 4px 0 rgba(0,0,0,0.4);">' + esc(n.link.label || 'abrir') + ' &#9656;</a>' : '') +
-        '</div>' +
+        '<div style="padding:22px 24px;">' + cuerpo + '</div>' +
       '</div>' +
     '</div>';
-    $('newsMount').innerHTML = html;
-    $('newsOverlay').addEventListener('click', closeNews);
-    $('newsCard').addEventListener('click', function (e) { e.stopPropagation(); });
-    $('newsClose').addEventListener('click', closeNews);
+    $('ovBack').addEventListener('click', closeModal);
+    $('ovCard').addEventListener('click', function (e) { e.stopPropagation(); });
+    $('ovClose').addEventListener('click', closeModal);
   }
-  function closeNews() { $('newsMount').innerHTML = ''; }
+  function closeModal() { $('modalMount').innerHTML = ''; }
+
+  /* ---------- FICHA DE UNA REUNIÓN ---------- */
+  function openMeeting(i) {
+    var r = meetings[i];
+    if (!r) return;
+    var color = r.planned ? '#4fd6a0' : '#f5b94d';
+
+    var cuerpo = '' +
+      '<div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:16px;">' +
+        '<span style="font-family:\'JetBrains Mono\',monospace; font-size:12px; font-weight:700; color:#050a0e; background:' + color + '; padding:3px 9px;">REUNIÓN</span>' +
+        '<span style="font-family:\'JetBrains Mono\',monospace; font-size:12px; color:' + color + '; border:1px solid ' + color + '; padding:2px 8px;">' + esc(r.iso) + '</span>' +
+      '</div>' +
+      '<div style="font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:clamp(19px,3vw,25px); color:#fff; line-height:1.25; margin-bottom:6px;">' + esc(r.planned ? r.title : (cal.meetingTitle || 'Reunión del semillero')) + '</div>' +
+      '<div style="font-family:\'JetBrains Mono\',monospace; font-size:14px; color:#9fc4cd; margin-bottom:18px;">' + esc(fechaLarga(r.date)) + '</div>' +
+      (r.planned ? '' :
+        '<div style="display:flex; gap:12px; align-items:flex-start; background:#070f18; border:2px solid #f5b94d; border-left:6px solid #f5b94d; padding:14px 16px; margin-bottom:18px;">' +
+          '<span style="font-family:\'Press Start 2P\'; font-size:12px; color:#f5b94d; line-height:1.2;">?</span>' +
+          '<span style="font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:15px; color:#f5b94d;">Tema por definir</span>' +
+        '</div>') +
+      '<p style="font-size:22px; line-height:1.45; color:#cfe8ec; margin:0; font-family:\'VT323\',monospace;">' + esc(r.text) + '</p>';
+
+    openOverlay(color, 'aperture@lab:~$ cat ./reuniones/' + r.iso + '.md', '640px', cuerpo);
+  }
+
+  /* ---------- FICHA DE UNA LÍNEA ---------- */
+  function openLine(key) {
+    var l = null;
+    studyLines.forEach(function (x) { if (x.key === key) l = x; });
+    if (!l) return;
+
+    var temas = (l.topics || []).map(function (t, i) {
+      return '' +
+      '<li style="color:' + l.accent + '; padding:12px; border:2px solid #173241; background:#070f18; animation:popIn .3s ease both; animation-delay:' + (i * 0.07) + 's;">' +
+        '<svg class="dgm" viewBox="0 0 44 26" aria-hidden="true">' + DIAGRAMAS[t.dgm] + '</svg>' +
+        '<span style="display:block; font-family:\'JetBrains Mono\',monospace; font-size:13px; line-height:1.45; color:#cfe8ec;">' + esc(t.name) + '</span>' +
+      '</li>';
+    }).join('');
+
+    var cuerpo = '' +
+      // La animación manda: se sale del padding para llenar el ancho de la ficha.
+      '<div class="viz" data-viz="' + esc(l.key) + '" aria-hidden="true" style="display:block; border-bottom:2px solid ' + l.accent + '; background:#04080c; margin:-22px -24px 20px;"></div>' +
+      '<div style="font-family:\'JetBrains Mono\',monospace; font-size:11px; letter-spacing:0.6px; text-transform:uppercase; color:#5c7a86; margin-bottom:10px;">' + esc(l.alias) + '</div>' +
+      '<h3 style="font-family:\'Press Start 2P\'; font-size:clamp(11px,2.2vw,15px); line-height:1.75; color:' + l.accent + '; margin:0 0 12px; font-weight:400;">' + esc(l.title) + '</h3>' +
+      '<p style="font-size:22px; line-height:1.4; color:#9fc4cd; margin:0 0 20px; font-family:\'VT323\',monospace;"><span style="color:' + l.accent + ';">//</span> ' + esc(l.essence) + '</p>' +
+      '<ul style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(150px,100%),1fr)); gap:10px; margin:0; padding:0; list-style:none;">' + temas + '</ul>';
+
+    openOverlay(l.accent, 'aperture@lab:~$ cat ./lineas/' + l.key + '.md', '680px', cuerpo);
+    mountVitrinas($('modalMount'));
+  }
 
   /* ---------- NAV ---------- */
   function initNav() {
@@ -414,12 +831,17 @@
   /* ---------- INIT ---------- */
   function init() {
     applySite();
-    renderGroups();
+    renderAccess();
+    renderLines();
+    renderCalendar();
     renderSocials();
     initNav();
     startMatrix();
     startNeuralNet();
     startBoot();
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' || e.keyCode === 27) closeModal();
+    });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();

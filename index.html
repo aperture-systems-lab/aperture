@@ -37,7 +37,10 @@
 
       <div class="navtabs" id="navtabs" style="display:flex; gap:18px; align-items:center; flex-wrap:wrap;">
         <div class="menuitem" style="position:relative;">
-          <button data-scroll="bitacora" style="cursor:pointer; background:transparent; border:none; font-family:'JetBrains Mono',monospace; font-size:16px; letter-spacing:0.3px; color:#9fc4cd; font-weight:400; padding:5px 0; border-bottom:3px solid transparent;">Bit&aacute;cora</button>
+          <button data-scroll="lineas" style="cursor:pointer; background:transparent; border:none; font-family:'JetBrains Mono',monospace; font-size:16px; letter-spacing:0.3px; color:#9fc4cd; font-weight:400; padding:5px 0; border-bottom:3px solid transparent;">L&iacute;neas</button>
+        </div>
+        <div class="menuitem" style="position:relative;">
+          <button data-scroll="calendario" style="cursor:pointer; background:transparent; border:none; font-family:'JetBrains Mono',monospace; font-size:16px; letter-spacing:0.3px; color:#9fc4cd; font-weight:400; padding:5px 0; border-bottom:3px solid transparent;">Calendario</button>
         </div>
         <div class="menuitem" style="position:relative;">
           <button data-scroll="contacto" style="cursor:pointer; background:transparent; border:none; font-family:'JetBrains Mono',monospace; font-size:16px; letter-spacing:0.3px; color:#9fc4cd; font-weight:400; padding:5px 0; border-bottom:3px solid transparent;">Contacto</button>
@@ -63,12 +66,12 @@
     </header>
 
     <section style="padding:44px 22px 30px;">
-      <div style="max-width:880px; margin:0 auto;">
+      <div style="max-width:1080px; margin:0 auto;">
 
         <div style="font-family:'JetBrains Mono',monospace; font-size:clamp(16px,2.4vw,21px); color:#cfe8ec; letter-spacing:1px; border-bottom:2px solid #29c5d6; padding-bottom:10px; margin-bottom:22px;">
           <span style="color:#1f8fa0;">$</span> cat ./sobre_aperture.md
         </div>
-        <p id="aboutText" style="font-size:24px; line-height:1.55; color:#9fc4cd; margin:0 0 8px; font-family:'JetBrains Mono',monospace;"><strong style="color:#29c5d6;">Aperture</strong> es una comunidad estudiantil construida en torno al <strong style="color:#29c5d6;">Data Science y la IA</strong>. Convertimos la teor&iacute;a en proyectos de valor, aportamos a la innovaci&oacute;n y aprendemos a escalarlos hasta que funcionen de verdad en el mundo real.</p>
+        <p id="aboutText" style="font-size:24px; line-height:1.55; color:#9fc4cd; margin:0 0 8px; max-width:820px; font-family:'JetBrains Mono',monospace;"><strong style="color:#29c5d6;">Aperture</strong> es una comunidad estudiantil construida en torno al <strong style="color:#29c5d6;">Data Science y la IA</strong>. Convertimos la teor&iacute;a en proyectos de valor, aportamos a la innovaci&oacute;n y aprendemos a escalarlos hasta que funcionen de verdad en el mundo real.</p>
 
         <!-- neural net viz -->
         <div style="font-family:'JetBrains Mono',monospace; font-size:clamp(15px,2.2vw,19px); color:#cfe8ec; letter-spacing:1px; border-bottom:2px solid #157a87; padding-bottom:10px; margin:46px 0 22px;">
@@ -92,9 +95,19 @@
     </section>
   </div>
 
-  <!-- ======= EXPLORA / BITÁCORA ======= -->
-  <section id="explora" data-screen-label="Explora" style="padding:44px 22px 22px; animation:popIn .25s ease; position:relative; z-index:2;">
-    <div style="max-width:1180px; margin:0 auto;" id="groupsMount"></div>
+  <!-- ======= CÓMO SE ENTRA ======= -->
+  <section data-screen-label="Acceso" style="padding:44px 22px 22px; animation:popIn .25s ease; position:relative; z-index:2;">
+    <div style="max-width:1080px; margin:0 auto;" id="accessMount"></div>
+  </section>
+
+  <!-- ======= LÍNEAS DE ESTUDIO ======= -->
+  <section data-screen-label="Líneas" style="padding:44px 22px 22px; animation:popIn .25s ease; position:relative; z-index:2;">
+    <div style="max-width:1080px; margin:0 auto;" id="linesMount"></div>
+  </section>
+
+  <!-- ======= CALENDARIO ======= -->
+  <section data-screen-label="Calendario" style="padding:44px 22px 22px; animation:popIn .25s ease; position:relative; z-index:2;">
+    <div style="max-width:1080px; margin:0 auto;" id="calendarMount"></div>
   </section>
 
   <!-- ======= CONTACTO ======= -->
@@ -122,8 +135,8 @@
     </div>
   </footer>
 
-  <!-- NEWS MODAL MOUNT -->
-  <div id="newsMount"></div>
+  <!-- MODAL MOUNT (reuniones · líneas) -->
+  <div id="modalMount"></div>
 
 </div>
 

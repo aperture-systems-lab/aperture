@@ -63,46 +63,105 @@ BOOT = [
     ("ACCESO",  "CONCEDIDO"),
 ]
 
-# ── BITÁCORA ──────────────────────────────────────────────────────────
-# La más reciente va primero. Campos opcionales: "link" y "chart".
-BITACORA = [
+# ── ANTES DE LAS LÍNEAS: cómo se entra ────────────────────────────────
+# Lo que no estaba en la web y sí en el perfil del semillero: que no hace
+# falta traer nada aprendido para entrar.
+ACCESO_TITULO = "SIN REQUISITOS PREVIOS"
+ACCESO_FRASE  = "Lo único que pedimos son ganas de aprender y de construir."
+
+# (número, título, texto, color)
+ACCESO_PUNTOS = [
+    ("01", "Se entra sin saber",
+     "No hace falta llegar sabiendo. La idea es aprender lo que no sepas, con la guía "
+     "de los demás miembros del semillero.",
+     "cian"),
+    ("02", "Se aprende construyendo",
+     "Fomentamos los proyectos, las competencias y todo lo práctico, porque se aprende haciendo.",
+     "verde"),
+    # El día concreto no se nombra aquí; sale del calendario (REUNION_DIA).
+    ("03", "Reuniones semanales",
+     "Cada semana nos vemos presencialmente en la Facultad de Minas para aprender juntos. "
+     "El calendario está más abajo.",
+     "ambar"),
+]
+
+# ── LÍNEAS DE ESTUDIO ─────────────────────────────────────────────────
+# Los tres frentes de trabajo del semillero. Cada uno se pinta con su propia
+# animación (la elige "clave": ds · ia · hpc) y abre una ficha al pulsarlo.
+#
+# Cada tema va acompañado de un diagrama. Disponibles:
+#   histograma · frontera · despliegue · capas · bucle · recuperar ·
+#   chip · reparto · ciclo
+LINEAS_TITULO = "LÍNEAS DE ESTUDIO"
+LINEAS_TEXTO  = "Tres frentes de trabajo. Pulsa una tarjeta para ver de qué va."
+
+LINEAS = [
     {
-        "tag": "INSTAGRAM",
-        "fecha": "2026-06-25",
-        "titulo": "Ya estamos en Instagram",
-        "texto": "Aperture abre su Instagram oficial: @aperture.systems. Síguenos para enterarte de charlas, sesiones y novedades del semillero.",
-        "color": "morado",
-        "link": {"url": "https://www.instagram.com/aperture.systems/", "texto": "abrir Instagram"},
-    },
-    {
-        "tag": "ENCUESTA",
-        "fecha": "2026-06-25",
-        "titulo": "Temas de interés para las charlas",
-        "texto": "Resultado de la consulta a la comunidad · 53 respuestas · selección múltiple.",
+        "clave": "ds",
         "color": "cian",
-        # Gráfico de barras: (tema, votos, porcentaje)
-        "chart": [
-            ("Cómo funcionan las redes neuronales", 30, 57),
-            ("Cómo hacer sistemas de agentes de IA", 29, 55),
-            ("Introducción a la minería de datos",   26, 49),
-            ("ML en producción",                     21, 40),
-            ("Arquitectura transformer",             19, 36),
-            ("Data Science en Medicina",             19, 36),
-            ("Data Science con fútbol",              17, 32),
-            ("Cómo usar OpenClaw",                   16, 30),
-            ("Cómo hacer un RAG",                    15, 28),
-            ("Data Science con Astronomía",          14, 26),
-            ("Data Science con F1 (fórmula 1)",      13, 25),
-            ("Introducción a GPU programming (CUDA)", 13, 25),
-            ("Análisis Topológico de Datos",         10, 19),
-            ("Cómo hacer un motor gráfico",          10, 19),
+        "nombre": "Data Science y Machine Learning",
+        "resumen": "Análisis, estadística y modelos que predicen.",
+        "alias": "Data Science & Machine Learning",
+        "titulo": "Ciencia de Datos y Aprendizaje Automático",
+        "esencia": "Del dato crudo al modelo en producción.",
+        "temas": [
+            ("Estadística y minería de datos",     "histograma"),
+            ("Aprendizaje automático y profundo",  "frontera"),
+            ("Modelos en producción",              "despliegue"),
         ],
     },
     {
-        "tag": "SITE",
-        "fecha": "2026-06-24",
-        "titulo": "Nueva web de Aperture",
-        "texto": "Estrenamos el sitio del semillero con su bitácora y sus canales de contacto. Hecho por y para la comunidad.",
+        "clave": "ia",
         "color": "ambar",
+        "nombre": "IA y Sistemas Inteligentes",
+        "resumen": "Transformers, agentes y RAG.",
+        "alias": "AI & Intelligent Systems",
+        "titulo": "Inteligencia Artificial y Sistemas Inteligentes",
+        "esencia": "De los modelos de lenguaje a los agentes que actúan.",
+        "temas": [
+            ("Modelos de lenguaje y Transformers", "capas"),
+            ("Agentes inteligentes",               "bucle"),
+            ("RAG y GraphRAG",                     "recuperar"),
+        ],
+    },
+    {
+        "clave": "hpc",
+        "color": "morado",
+        "nombre": "High Performance Computing",
+        "resumen": "Cómputo en GPU, en paralelo y a escala.",
+        "alias": "High Performance Computing",
+        "titulo": "Computación de Alto Desempeño e Infraestructura para IA",
+        "esencia": "El cómputo que entrena y sostiene la IA.",
+        "temas": [
+            ("Programación en GPU",                "chip"),
+            ("Cómputo paralelo y distribuido",     "reparto"),
+            ("MLOps y LLMOps",                     "ciclo"),
+        ],
     },
 ]
+
+# ── CALENDARIO ────────────────────────────────────────────────────────
+CALENDARIO_TITULO = "CALENDARIO"
+CALENDARIO_TEXTO  = "La época de clases y las reuniones del semillero, semana a semana."
+
+# Época de clases (AAAA-MM-DD). Los días entre estas dos fechas se resaltan.
+CLASES_INICIO = "2026-08-27"
+CLASES_FIN    = "2026-12-19"
+
+# Día de la reunión semanal: 0=lunes 1=martes 2=miércoles … 6=domingo
+REUNION_DIA    = 2
+REUNION_TITULO = "Reunión del semillero"
+REUNION_NOTA   = ("Todavía no se tiene planeado qué se dará en esta sesión. "
+                  "El tema se anuncia por WhatsApp e Instagram unos días antes.")
+
+# Cuando ya se sepa el tema de una reunión, ponla aquí y deja de salir como
+# «por definir»:   "2026-09-02": ("Título", "Un par de líneas sobre la sesión"),
+REUNIONES = {
+}
+
+# Fechas marcadas del semestre:  "AAAA-MM-DD": (etiqueta, color)
+# Las académicas van todas en ámbar; deja los otros colores para lo demás.
+HITOS = {
+    "2026-08-27": ("Inicio de clases", "ambar"),
+    "2026-12-19": ("Fin de clases",    "ambar"),
+}
