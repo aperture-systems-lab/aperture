@@ -1,17 +1,5 @@
 # Aperture
 
-Página estática del semillero (HTML + CSS + JS, sin build ni dependencias).
-
-Para verla en local:
-
-```
-python -m http.server 8000
-```
-
-Y abrir http://localhost:8000
-
-## Cómo cambiar el contenido
-
 Todo el contenido del sitio vive en un solo archivo: `content.py`. Nunca hay que
 tocar el HTML ni el JS para cambiar un texto.
 
@@ -70,7 +58,7 @@ copia el anterior y edítalo. Por ejemplo, un chip nuevo:
 CHIPS = [
     ("Data Science",     "cian"),
     ("Machine Learning", "verde"),
-    ("Visión por Computador", "azul"),   # <- nuevo
+    ("Visión por Computador", "azul"),
 ]
 ```
 
