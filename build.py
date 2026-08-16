@@ -1,11 +1,3 @@
-"""
-BUILD.PY — Genera js/data.js a partir de content.py
-
-No edites js/data.js a mano. Edita content.py y luego corre:
-
-    python build.py
-"""
-
 import json
 import sys
 from pathlib import Path
@@ -21,10 +13,10 @@ GLOWS = {
     "#f5b94d": "rgba(245,185,77,0.3)",
     "#c79bff": "rgba(199,155,255,0.3)",
     "#5fb0ff": "rgba(95,176,255,0.3)",
+    "#ff5a61": "rgba(255,90,97,0.32)",
 }
 
 def hexof(color):
-    """Acepta un nombre de COLORES o un código hex directo."""
     return C.COLORES.get(color, color)
 
 def glowof(color):
@@ -45,6 +37,29 @@ def build_lines():
             "title": l["titulo"],
             "essence": l["esencia"],
             "topics": [{"name": n, "dgm": d} for (n, d) in l["temas"]],
+        })
+    return out
+
+def build_projects():
+    out = []
+    for p in getattr(C, "PROYECTOS", []):
+        color = p.get("color", "cian")
+        out.append({
+            "key": p["clave"],
+            "accent": hexof(color),
+            "glow": glowof(color),
+            "name": p["nombre"],
+            "brand": p.get("marca", ""),
+            "title": p["titulo"],
+            "period": p.get("periodo", ""),
+            "status": p.get("estado", ""),
+            "summary": p["resumen"],
+            "description": p["descripcion"],
+            "highlights": p.get("claves", []),
+            "tags": p.get("tags", []),
+            "authors": p.get("autores", []),
+            "video": p.get("video", ""),
+            "links": [{"text": t, "url": u, "primary": bool(d)} for (t, u, d) in p.get("enlaces", [])],
         })
     return out
 
@@ -74,10 +89,14 @@ def build_data():
             "chips": [{"text": t, "color": hexof(c)} for (t, c) in C.CHIPS],
             "about": C.SOBRE,
             "labPhrase": C.LAB_FRASE,
+            "labInvite": C.LAB_INVITACION,
             "contactTitle": C.CONTACTO_TITULO,
             "contactText": C.CONTACTO_TEXTO,
             "linesTitle": C.LINEAS_TITULO,
             "linesText": C.LINEAS_TEXTO,
+            "projectsTitle": C.PROYECTOS_TITULO,
+            "projectsText": C.PROYECTOS_TEXTO,
+            "projectsButton": C.PROYECTOS_BOTON,
             "accessTitle": C.ACCESO_TITULO,
             "accessPhrase": C.ACCESO_FRASE,
         },
@@ -90,6 +109,7 @@ def build_data():
             for i, (l, v) in enumerate(C.BOOT)
         ],
         "lines": build_lines(),
+        "projects": build_projects(),
         "calendar": build_calendar(),
         "socials": [
             {"label": lbl, "handle": h, "url": u, "glyph": g,

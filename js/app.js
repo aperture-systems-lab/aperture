@@ -12,7 +12,7 @@
   var glowMap = {
     '#33c9d6': 'rgba(51,201,214,0.32)', '#4fd6a0': 'rgba(79,214,160,0.32)',
     '#f5b94d': 'rgba(245,185,77,0.3)', '#c79bff': 'rgba(199,155,255,0.3)',
-    '#5fb0ff': 'rgba(95,176,255,0.3)'
+    '#5fb0ff': 'rgba(95,176,255,0.3)', '#ff5a61': 'rgba(255,90,97,0.32)'
   };
   function glowFor(c) { return glowMap[c] || 'rgba(41,197,214,0.3)'; }
 
@@ -31,8 +31,10 @@
     setHTML('heroText', site.heroText);
     setHTML('aboutText', site.about);
     setText('labPhrase', site.labPhrase);
+    setText('labInvite', site.labInvite);
     setText('contactTitle', site.contactTitle);
     setText('contactText', site.contactText);
+    if (site.projectsButton && $('pjAccessBtn')) $('pjAccessBtn').innerHTML = esc(site.projectsButton) + ' &#9656;';
     if (site.chips && $('heroChips')) {
       $('heroChips').innerHTML = site.chips.map(function (c) {
         return '<span style="font-family:\'JetBrains Mono\',monospace; font-size:13px; color:' + c.color + '; border:1px solid #1f6f7c; background:#0a1622; padding:5px 11px;">' + esc(c.text) + '</span>';
@@ -599,20 +601,23 @@
             '<div style="margin-top:8px; font-size:clamp(14px,2.2vw,20px);"><span style="display:inline-block; width:11px; height:18px; background:#29c5d6; animation:blink 1s steps(1) infinite; vertical-align:-2px;"></span></div>' +
           '</div>' +
         '</div>' +
-        '<div style="position:absolute; bottom:22px; right:26px; font-size:14px; color:#3f6470;">[ click para saltar ]</div>' +
+        '<div style="position:absolute; bottom:22px; right:26px; font-size:14px; color:#3f6470;">[ pulsa para saltar ]</div>' +
       '</div>';
       var ov = $('bootOverlay');
       if (ov) ov.addEventListener('click', skip);
     }
     function finish() {
+      document.removeEventListener('keydown', skip);
       mount.innerHTML = '';
       $('nav').style.animation = 'siteIn 0.6s ease';
     }
     function skip() {
+      if (closing) return;
       timers.forEach(clearTimeout); timers = [];
       closing = true; render();
       setTimeout(finish, 600);
     }
+    document.addEventListener('keydown', skip);
     render();
     bootRows.forEach(function (_, i) {
       timers.push(setTimeout(function () { lines = i + 1; render(); }, 380 + i * 420));
@@ -772,6 +777,7 @@
     renderCalendar();
     renderSocials();
     initNav();
+    if (window.location.hash.length > 1) scrollToId(window.location.hash.slice(1));
     startMatrix();
     startNeuralNet();
     startBoot();

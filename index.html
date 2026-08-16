@@ -33,7 +33,7 @@
 
       <div class="navtabs" id="navtabs" style="display:flex; gap:18px; align-items:center; flex-wrap:wrap;">
         <div class="menuitem" style="position:relative;">
-          <button data-scroll="lineas" style="cursor:pointer; background:transparent; border:none; font-family:'JetBrains Mono',monospace; font-size:16px; letter-spacing:0.3px; color:#9fc4cd; font-weight:400; padding:5px 0; border-bottom:3px solid transparent;">L&iacute;neas</button>
+          <a href="proyectos/" style="text-decoration:none; display:inline-block; font-family:'JetBrains Mono',monospace; font-size:16px; letter-spacing:0.3px; color:#9fc4cd; font-weight:400; padding:5px 0; border-bottom:3px solid transparent;">Proyectos</a>
         </div>
         <div class="menuitem" style="position:relative;">
           <button data-scroll="calendario" style="cursor:pointer; background:transparent; border:none; font-family:'JetBrains Mono',monospace; font-size:16px; letter-spacing:0.3px; color:#9fc4cd; font-weight:400; padding:5px 0; border-bottom:3px solid transparent;">Calendario</button>
@@ -80,9 +80,10 @@
             <span style="font-size:12px; color:#27c93f; font-family:'JetBrains Mono',monospace;">&#9679; running</span>
           </div>
           <canvas id="neuralNet" style="display:block; width:100%; height:320px; background:radial-gradient(ellipse at center, #0b1a24, #070f18);"></canvas>
-          <div style="padding:17px 20px; border-top:2px solid #157a87; background:#0a1622;">
-            <div id="labPhrase" style="font-family:'JetBrains Mono',monospace; font-size:clamp(16px,2.4vw,21px); font-weight:700; color:#fff; line-height:1.3;">No solo estudiamos la IA. La construimos y la llevamos a la realidad.</div>
-          </div>
+          <a class="pjaccess" href="proyectos/" style="display:flex; align-items:center; justify-content:space-between; gap:28px; flex-wrap:wrap; text-decoration:none; padding:26px; border-top:2px solid #157a87; background:#0a1622; transition:background .16s;">
+            <div id="labBlock" style="flex:1 1 430px; min-width:0; font-family:'JetBrains Mono',monospace; font-size:clamp(17px,2.5vw,22px); font-weight:700; line-height:1.5; color:#fff;"><span id="labPhrase">No solo estudiamos la IA. La construimos y la llevamos a la realidad.</span> <span id="labInvite" style="color:#29c5d6;">Conoce los proyectos del semillero.</span></div>
+            <span class="pjbtn" id="pjAccessBtn" style="flex:none; display:inline-flex; align-items:center; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:14px; letter-spacing:0.5px; color:#050a0e; background:#29c5d6; padding:15px 25px; box-shadow:4px 4px 0 #12525c; transition:transform .16s, box-shadow .16s;">ver los proyectos &#9656;</span>
+          </a>
         </div>
 
       </div>

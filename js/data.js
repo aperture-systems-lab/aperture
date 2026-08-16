@@ -23,10 +23,14 @@ window.APERTURE_DATA = {
     ],
     "about": "<strong style=\"color:#29c5d6;\">Aperture</strong> es una comunidad estudiantil construida en torno al <strong style=\"color:#29c5d6;\">Data Science y la IA</strong>. Convertimos la teoría en proyectos de valor, aportamos a la innovación y aprendemos a escalarlos hasta que funcionen de verdad en el mundo real.",
     "labPhrase": "No solo estudiamos la IA. La construimos y la llevamos a la realidad.",
+    "labInvite": "Conoce los proyectos del semillero.",
     "contactTitle": "CONTACTO",
     "contactText": "¿Te suena? Súmate al semillero o escríbenos por cualquiera de estos canales.",
     "linesTitle": "LÍNEAS DE ESTUDIO",
     "linesText": "Tres frentes de trabajo. Pulsa una tarjeta para ver de qué va.",
+    "projectsTitle": "PROYECTOS",
+    "projectsText": "Del notebook a producción. Conoce los proyectos construidos en el semillero, inspírate con ellos o súmate a mejorarlos.",
+    "projectsButton": "ver los proyectos",
     "accessTitle": "SIN REQUISITOS PREVIOS",
     "accessPhrase": "Lo único que pedimos son ganas de aprender y de construir."
   },
@@ -146,6 +150,52 @@ window.APERTURE_DATA = {
         {
           "name": "MLOps y LLMOps",
           "dgm": "ciclo"
+        }
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "key": "sanghelios",
+      "accent": "#ff5a61",
+      "glow": "rgba(255,90,97,0.32)",
+      "name": "Sanghelios",
+      "brand": "<span style=\"display:inline-flex; align-items:center; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:clamp(27px,5vw,40px); letter-spacing:-1px; line-height:1;\"><span style=\"color:#ff5a61;\">Sang</span><span style=\"color:#cfe8ec;\">heli</span><svg viewBox=\"0 0 24 30\" style=\"width:0.76em; height:0.95em; margin:0 0.03em;\" fill=\"none\" aria-hidden=\"true\"><path d=\"M12 1.6C12 1.6 2.6 13 2.6 19.2a9.4 9.4 0 0 0 18.8 0C21.4 13 12 1.6 12 1.6Z\" stroke=\"#ff5a61\" stroke-width=\"2.7\"/><path d=\"M7.7 19.4a4.3 4.3 0 0 0 4.3 4.3\" stroke=\"#ff5a61\" stroke-width=\"2.7\" stroke-linecap=\"round\"/></svg><span style=\"color:#cfe8ec;\">s</span></span>",
+      "title": "Inteligencia Predictiva para Bancos de Sangre",
+      "period": "may. 2026 – jul. 2026",
+      "status": "desplegado",
+      "summary": "Anticipa la escasez de sangre 14 días antes y la convierte en campañas de donación.",
+      "description": "Sistema que predice 14 días antes las posibles escaseces de sangre en el Hospital General de Medellín utilizando un modelo XGBoost, convirtiendo esa señal en campañas de donación diseñadas con IA, desplegadas mediante un dashboard y un mapa 3D.",
+      "highlights": [
+        "Predicción de escasez con 14 días de anticipación (XGBoost).",
+        "Campañas de donación redactadas y segmentadas por agentes de IA.",
+        "Dashboard operativo y mapa 3D de Medellín para ver dónde donar."
+      ],
+      "tags": [
+        "Python",
+        "FastAPI",
+        "XGBoost",
+        "Agentes de IA",
+        "Data Science",
+        "Machine Learning"
+      ],
+      "authors": [
+        "Jerónimo Hoyos",
+        "Daniel Arango",
+        "Jose Miguel García",
+        "Valentina Muñoz"
+      ],
+      "video": "7mOG2cgMJ0c",
+      "links": [
+        {
+          "text": "ver el despliegue",
+          "url": "https://main.jero98772.page/sanghelios/",
+          "primary": true
+        },
+        {
+          "text": "repositorio",
+          "url": "https://github.com/aperture-systems-lab/Sanghelios",
+          "primary": false
         }
       ]
     }
