@@ -1,4 +1,6 @@
+import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -6,6 +8,13 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
 import content as C
+
+PAGINAS = ("index.html", "proyectos/index.html", "links/index.html")
+ESTATICOS = ("js/app.js", "js/proyectos.js", "css/styles.css")
+
+ENLACE = re.compile(
+    r'(<(?:script|link)\b[^>]*?\b(?:src|href)=")((?!https?://)[^"?]+\.(?:js|css))(?:\?[^"]*)?(")'
+)
 
 GLOWS = {
     "#33c9d6": "rgba(51,201,214,0.32)",
@@ -118,12 +127,38 @@ def build_data():
         ],
     }
 
+def calcular_version(datos):
+    h = hashlib.md5(datos.encode("utf-8"))
+    for rel in ESTATICOS:
+        ruta = ROOT / rel
+        if ruta.exists():
+            h.update(ruta.read_bytes())
+    return h.hexdigest()[:8]
+
+def sellar_paginas(version):
+    tocadas = []
+    for rel in PAGINAS:
+        ruta = ROOT / rel
+        if not ruta.exists():
+            continue
+        html = ruta.read_text(encoding="utf-8")
+        nuevo = ENLACE.sub(lambda m: m.group(1) + m.group(2) + "?v=" + version + m.group(3), html)
+        if nuevo != html:
+            ruta.write_text(nuevo, encoding="utf-8", newline="")
+            tocadas.append(rel)
+    return tocadas
+
 def main():
     data = build_data()
     body = json.dumps(data, ensure_ascii=False, indent=2)
+    contenido = "window.APERTURE_DATA = " + body + ";\n"
     out = ROOT / "js" / "data.js"
-    out.write_text("window.APERTURE_DATA = " + body + ";\n", encoding="utf-8")
+    out.write_text(contenido, encoding="utf-8", newline="")
     print(f"OK · generado {out.relative_to(ROOT)}")
+
+    version = calcular_version(contenido)
+    tocadas = sellar_paginas(version)
+    print(f"OK · version {version}" + (f" · actualizado {', '.join(tocadas)}" if tocadas else " · sin cambios"))
 
 if __name__ == "__main__":
     main()
