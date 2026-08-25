@@ -160,10 +160,10 @@ PROYECTOS = [
     },
 ]
 
-CALENDARIO_TITULO = "CALENDARIO"
+CALENDARIO_TITULO = "CALENDARIO 2026-2"
 CALENDARIO_TEXTO  = "La época de clases y las reuniones del semillero, semana a semana."
 
-CLASES_INICIO = "2026-08-27"
+CLASES_INICIO = "2026-09-16"
 CLASES_FIN    = "2026-12-19"
 
 REUNION_DIA    = 2
@@ -175,6 +175,6 @@ REUNIONES = {
 }
 
 HITOS = {
-    "2026-08-27": ("Inicio de clases", "ambar"),
+    "2026-09-16": ("Inicio de clases", "ambar"),
     "2026-12-19": ("Fin de clases",    "ambar"),
 }

@@ -201,16 +201,16 @@ window.APERTURE_DATA = {
     }
   ],
   "calendar": {
-    "title": "CALENDARIO",
+    "title": "CALENDARIO 2026-2",
     "text": "La época de clases y las reuniones del semillero, semana a semana.",
-    "start": "2026-08-27",
+    "start": "2026-09-16",
     "end": "2026-12-19",
     "meetingWeekday": 2,
     "meetingTitle": "Reunión del semillero",
     "meetingNote": "Todavía no se tiene planeado qué se dará en esta sesión. El tema se anuncia por WhatsApp e Instagram unos días antes.",
     "meetings": {},
     "milestones": {
-      "2026-08-27": {
+      "2026-09-16": {
         "label": "Inicio de clases",
         "accent": "#f5b94d"
       },
