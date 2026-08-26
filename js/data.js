@@ -52,7 +52,7 @@ window.APERTURE_DATA = {
     {
       "num": "03",
       "title": "Reuniones semanales",
-      "text": "Cada semana nos vemos presencialmente en la Facultad de Minas para aprender juntos. El calendario está más abajo.",
+      "text": "Cada lunes de 4 a 6 p. m. nos vemos presencialmente en la Facultad de Minas para aprender juntos. El calendario está más abajo.",
       "accent": "#f5b94d",
       "glow": "rgba(245,185,77,0.3)"
     }
@@ -202,23 +202,47 @@ window.APERTURE_DATA = {
   ],
   "calendar": {
     "title": "CALENDARIO 2026-2",
-    "text": "La época de clases y las reuniones del semillero, semana a semana.",
-    "start": "2026-09-16",
-    "end": "2026-12-19",
-    "meetingWeekday": 2,
+    "text": "Las reuniones del semillero, semana a semana.",
+    "start": "2026-09-07",
+    "end": "2026-11-23",
+    "meetingWeekday": 0,
     "meetingTitle": "Reunión del semillero",
-    "meetingNote": "Todavía no se tiene planeado qué se dará en esta sesión. El tema se anuncia por WhatsApp e Instagram unos días antes.",
-    "meetings": {},
-    "milestones": {
-      "2026-09-16": {
-        "label": "Inicio de clases",
-        "accent": "#f5b94d"
+    "meetingPlace": "Facultad de Minas",
+    "meetingTime": "4:00 – 6:00 p. m.",
+    "meetings": {
+      "2026-09-28": {
+        "title": "Visión Artificial",
+        "speaker": "Asesor Ágora",
+        "text": "Cómo una máquina aprende a ver. De los píxeles crudos al modelo que reconoce lo que hay dentro de una imagen."
       },
-      "2026-12-19": {
-        "label": "Fin de clases",
-        "accent": "#f5b94d"
+      "2026-10-26": {
+        "title": "Análisis Topológico de Datos",
+        "speaker": "Carlos Reza",
+        "text": "La forma de los datos también dice cosas. Cómo la topología encuentra estructura donde la estadística clásica no llega."
+      },
+      "2026-11-09": {
+        "title": "Data Science con Fórmula 1",
+        "speaker": "Jose Miguel García",
+        "text": "Telemetría, estrategia de pits y ritmo de carrera. Qué tanto se puede predecir con los datos que deja cada vuelta."
       }
-    }
+    },
+    "holidays": {
+      "2026-10-12": {
+        "label": "Día de la Raza"
+      },
+      "2026-11-02": {
+        "label": "Día de Todos los Santos"
+      },
+      "2026-11-16": {
+        "label": "Independencia de Cartagena"
+      }
+    },
+    "skipped": {
+      "2026-11-30": {
+        "label": "La Alborada"
+      }
+    },
+    "milestones": {}
   },
   "socials": [
     {

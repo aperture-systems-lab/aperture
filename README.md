@@ -25,7 +25,7 @@ Cada variable en mayúsculas es un pedazo de la página:
 | `ACCESO_TITULO`, `ACCESO_FRASE`, `ACCESO_PUNTOS` | La sección de requisitos |
 | `LINEAS` | Las tres líneas de estudio y sus temas |
 | `PROYECTOS_*`, `PROYECTOS` | La página de proyectos y el botón que lleva a ella |
-| `CALENDARIO_*`, `CLASES_*`, `REUNIONES`, `HITOS` | El calendario |
+| `CALENDARIO_*`, `REUNION_*`, `REUNIONES`, `FESTIVOS`, `SIN_REUNION`, `HITOS` | El calendario |
 | `REDES`, `CONTACTO_TITULO`, `CONTACTO_TEXTO` | La sección de contacto |
 | `BOOT` | Las líneas del "arranque" tipo terminal |
 | `COLORES` | La paleta: `cian`, `verde`, `ambar`, `morado`, `azul`, `rojo` |
@@ -105,18 +105,40 @@ vería mal sobre el fondo oscuro del sitio. Si lo dejas fuera, la tarjeta usa el
 
 ### El calendario
 
-Las reuniones **no** se escriben una a una: se generan solas a partir de
-`CLASES_INICIO`, `CLASES_FIN` y `REUNION_DIA` (0 = lunes, 2 = miércoles).
+Las reuniones **no** se escriben una a una: se generan solas todos los
+`REUNION_DIA` (0 = lunes, 2 = miércoles) que caigan entre `REUNION_INICIO` y
+`REUNION_FIN`. Esas dos fechas son también los meses que enseña el calendario.
+El sitio muestra siempre el mismo sitio y la misma hora, que salen de
+`REUNION_LUGAR` y `REUNION_HORA`.
 
 Todas salen como «tema por definir» hasta que le pongas uno en `REUNIONES`,
-usando la fecha como clave:
+usando la fecha como clave y `(título, ponente, de qué va)` como valor:
 
 ```python
 REUNIONES = {
-    "2026-09-02": ("Cómo funcionan las redes neuronales", "De qué va la sesión."),
-    "2026-09-09": ("Introducción a PyTorch", "Primer modelo entrenado en clase."),
+    "2026-09-02": ("Cómo funcionan las redes neuronales", "Ana Pérez", "De qué va la sesión."),
+    "2026-09-09": ("Introducción a PyTorch", "", ""),
 }
 ```
+
+El ponente y la descripción pueden ir vacíos: solo se pintan si tienen algo.
+
+Los días que **no** hay reunión se sacan solos de la lista. Los festivos van en
+`FESTIVOS` y las semanas que se caen por cualquier otro motivo van en
+`SIN_REUNION`:
+
+```python
+FESTIVOS = {
+    "2026-10-12": "Día de la Raza",
+}
+
+SIN_REUNION = {
+    "2026-11-30": "La Alborada",
+}
+```
+
+Si la fecha cae en el día de reunión, ese día se queda sin marcar y esa semana
+desaparece de la lista. El motivo es solo para ti: el sitio no lo enseña.
 
 Las fechas sueltas que quieras resaltar (inicio de clases, parciales, eventos)
 van en `HITOS`, con su color:

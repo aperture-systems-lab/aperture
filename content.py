@@ -59,8 +59,8 @@ ACCESO_PUNTOS = [
      "verde"),
 
     ("03", "Reuniones semanales",
-     "Cada semana nos vemos presencialmente en la Facultad de Minas para aprender juntos. "
-     "El calendario está más abajo.",
+     "Cada lunes de 4 a 6 p. m. nos vemos presencialmente en la Facultad de Minas para "
+     "aprender juntos. El calendario está más abajo.",
      "ambar"),
 ]
 
@@ -161,20 +161,37 @@ PROYECTOS = [
 ]
 
 CALENDARIO_TITULO = "CALENDARIO 2026-2"
-CALENDARIO_TEXTO  = "La época de clases y las reuniones del semillero, semana a semana."
+CALENDARIO_TEXTO  = "Las reuniones del semillero, semana a semana."
 
-CLASES_INICIO = "2026-09-16"
-CLASES_FIN    = "2026-12-19"
-
-REUNION_DIA    = 2
+REUNION_INICIO = "2026-09-07"
+REUNION_FIN    = "2026-11-23"
+REUNION_DIA    = 0
 REUNION_TITULO = "Reunión del semillero"
-REUNION_NOTA   = ("Todavía no se tiene planeado qué se dará en esta sesión. "
-                  "El tema se anuncia por WhatsApp e Instagram unos días antes.")
+REUNION_LUGAR  = "Facultad de Minas"
+REUNION_HORA   = "4:00 – 6:00 p. m."
 
 REUNIONES = {
+    # fecha: (título, ponente, de qué va)
+    "2026-09-28": ("Visión Artificial", "Asesor Ágora",
+                   "Cómo una máquina aprende a ver. De los píxeles crudos al modelo "
+                   "que reconoce lo que hay dentro de una imagen."),
+    "2026-10-26": ("Análisis Topológico de Datos", "Carlos Reza",
+                   "La forma de los datos también dice cosas. Cómo la topología "
+                   "encuentra estructura donde la estadística clásica no llega."),
+    "2026-11-09": ("Data Science con Fórmula 1", "Jose Miguel García",
+                   "Telemetría, estrategia de pits y ritmo de carrera. Qué tanto se "
+                   "puede predecir con los datos que deja cada vuelta."),
+}
+
+FESTIVOS = {
+    "2026-10-12": "Día de la Raza",
+    "2026-11-02": "Día de Todos los Santos",
+    "2026-11-16": "Independencia de Cartagena",
+}
+
+SIN_REUNION = {
+    "2026-11-30": "La Alborada",
 }
 
 HITOS = {
-    "2026-09-16": ("Inicio de clases", "ambar"),
-    "2026-12-19": ("Fin de clases",    "ambar"),
 }

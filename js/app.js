@@ -61,6 +61,8 @@
   var CAL_END = cal.end ? parseISO(cal.end) : null;
   var MEET_WD = cal.meetingWeekday == null ? 2 : cal.meetingWeekday;
   var HITOS = cal.milestones || {};
+  var FESTIVOS = cal.holidays || {};
+  var SIN_REUNION = cal.skipped || {};
 
   var meetings = (function () {
     var out = [], d, extra, iso;
@@ -68,12 +70,14 @@
     for (d = new Date(CAL_START); d <= CAL_END; d.setDate(d.getDate() + 1)) {
       if (wdIdx(d) !== MEET_WD) continue;
       iso = toISO(d);
+      if (FESTIVOS[iso] || SIN_REUNION[iso]) continue;
       extra = (cal.meetings || {})[iso];
       out.push({
         iso: iso,
         date: new Date(d),
         title: extra && extra.title ? extra.title : (cal.meetingTitle || 'Reunión del semillero'),
-        text: extra && extra.text ? extra.text : (cal.meetingNote || ''),
+        speaker: extra && extra.speaker ? extra.speaker : '',
+        text: extra && extra.text ? extra.text : '',
         planned: !!(extra && extra.title)
       });
     }
@@ -97,13 +101,11 @@
   function dayCell(d) {
     var iso = toISO(d);
     var hoy = toISO(new Date()) === iso;
-    var enClases = CAL_START && CAL_END && d >= CAL_START && d <= CAL_END;
     var mi = meetIdx[iso];
     var hito = HITOS[iso];
     var esReunion = mi != null;
 
-    var fg = '#33505c', bg = 'transparent', bd = '1px solid transparent', extra = '';
-    if (enClases) { fg = '#cfe8ec'; bg = '#0c2029'; bd = '1px solid #16404d'; }
+    var fg = '#7fa2ac', bg = 'transparent', bd = '1px solid transparent', extra = '';
     if (esReunion) {
       fg = '#4fd6a0'; bg = '#082019'; bd = '2px solid #4fd6a0';
       extra = 'box-shadow:0 0 10px rgba(79,214,160,0.22); font-weight:700;';
@@ -112,7 +114,7 @@
       fg = hito.accent; bd = '2px solid ' + hito.accent;
       extra = 'box-shadow:0 0 12px ' + glowFor(hito.accent) + '; font-weight:700;';
     }
-    if (hoy) extra += ' outline:1px dashed #5c7a86; outline-offset:2px;';
+    if (hoy) extra += ' outline:2px dashed #29c5d6; outline-offset:2px;';
 
     var style = 'position:relative; display:grid; place-items:center; height:' + CELDA + 'px; margin:0; padding:0; ' +
       'font-family:\'JetBrains Mono\',monospace; font-size:15px; color:' + fg + '; background:' + bg +
@@ -126,14 +128,19 @@
       return '<button class="calcell calday" data-meet="' + mi + '" title="' + esc(cal.meetingTitle || 'Reunión') + ' · ' + esc(fechaLarga(d)) + '" ' +
         'style="cursor:pointer; transition:transform .1s, box-shadow .1s; ' + style + '">' + d.getDate() + punto + '</button>';
     }
-    return '<span class="calcell"' + (hito ? ' title="' + esc(hito.label) + '"' : '') + ' style="' + style + '">' + d.getDate() + '</span>';
+
+    return '<span class="calcell"' + (hito ? ' title="' + esc(hito.label) + '"' : '') +
+      ' style="' + style + '">' + d.getDate() + punto + '</span>';
   }
 
   var CAL_MESES = (function () {
     var out = [];
     if (!CAL_START || !CAL_END) return out;
+    var hoy = new Date(), hoyAbs = hoy.getFullYear() * 12 + hoy.getMonth();
     var y = CAL_START.getFullYear(), m = CAL_START.getMonth();
     var yFin = CAL_END.getFullYear(), mFin = CAL_END.getMonth();
+    if (hoyAbs < y * 12 + m) { y = hoy.getFullYear(); m = hoy.getMonth(); }
+    if (hoyAbs > yFin * 12 + mFin) { yFin = hoy.getFullYear(); mFin = hoy.getMonth(); }
     while (y < yFin || (y === yFin && m <= mFin)) {
       out.push({ y: y, m: m });
       m++; if (m > 11) { m = 0; y++; }
@@ -200,12 +207,44 @@
     $('calNext').addEventListener('click', function () { if (mesIdx < CAL_MESES.length - 1) { mesIdx++; pintarMes(); } });
   }
 
+  function enMesesVisibles(iso) {
+    if (!CAL_MESES.length) return false;
+    var d = parseISO(iso);
+    var a = CAL_MESES[0], z = CAL_MESES[CAL_MESES.length - 1];
+    return d >= new Date(a.y, a.m, 1) && d <= new Date(z.y, z.m + 1, 0);
+  }
+
+  function filaReunion(r, i) {
+    var color = r.planned ? '#4fd6a0' : '#5c7a86';
+    var fondo = r.planned ? '#082019' : 'transparent';
+    return '' +
+    '<button class="filareu" data-meet="' + i + '" title="' + esc(fechaLarga(r.date)) + '" ' +
+      'style="cursor:pointer; text-align:left; width:100%; background:transparent; border:none; padding:2px 0; margin:-2px 0; ' +
+      'display:flex; align-items:flex-start; gap:8px; font-family:\'JetBrains Mono\',monospace; font-size:13px; line-height:1.35; color:#9fc4cd; transition:transform .1s, color .1s;">' +
+      '<span style="flex:none; width:17px; height:17px; display:grid; place-items:center; font-size:9px; color:' + color + '; border:2px solid ' + color + '; background:' + fondo + ';">&#9679;</span>' +
+      '<span style="min-width:0;">' +
+        '<b style="color:' + color + ';">' + esc(fechaCorta(r.date)) + '</b> · ' +
+        esc(r.planned ? r.title : 'sin programar') +
+      '</span>' +
+    '</button>';
+  }
+
+  function bloqueHorario() {
+    if (!cal.meetingTime && !cal.meetingPlace) return '';
+    return '' +
+    '<div style="background:#070f18; border:2px solid #173241; border-left:6px solid #4fd6a0; padding:13px 15px; display:flex; flex-direction:column; gap:5px;">' +
+      '<span style="font-family:\'JetBrains Mono\',monospace; font-size:11px; letter-spacing:0.6px; text-transform:uppercase; color:#5c7a86;">cada ' + esc(DIAS[MEET_WD]) + '</span>' +
+      (cal.meetingTime ? '<span style="font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:16px; color:#4fd6a0;">' + esc(cal.meetingTime) + '</span>' : '') +
+      (cal.meetingPlace ? '<span style="font-family:\'JetBrains Mono\',monospace; font-size:13px; color:#9fc4cd;">' + esc(cal.meetingPlace) + '</span>' : '') +
+    '</div>';
+  }
+
   function renderCalendar() {
     var mount = $('calendarMount');
     if (!mount) return;
     if (!CAL_MESES.length) { mount.innerHTML = ''; return; }
 
-    var hitos = Object.keys(HITOS).sort().map(function (iso) {
+    var hitos = Object.keys(HITOS).filter(enMesesVisibles).sort().map(function (iso) {
       var h = HITOS[iso], d = parseISO(iso);
       return legendItem(h.accent, '&#9670;', fechaCorta(d) + ' · ' + h.label.toLowerCase(), 'transparent');
     }).join('');
@@ -220,40 +259,16 @@
         '<div id="calMes"></div>' +
         '<aside style="display:flex; flex-direction:column; gap:18px;">' +
           '<div style="display:flex; flex-direction:column; gap:11px;">' +
-            legendItem('#16404d', '', 'época de clases', '#0c2029') +
-            legendItem('#4fd6a0', '&#9679;', 'reunión', '#082019') +
-            hitos +
+            meetings.map(filaReunion).join('') + hitos +
           '</div>' +
-          '<button class="alllink" id="verReuniones" style="cursor:pointer; align-self:flex-start; display:inline-flex; align-items:center; gap:8px; font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:14px; letter-spacing:0.3px; color:#4fd6a0; border:2px solid #1f6f7c; background:#0a1622; padding:12px 20px; box-shadow:4px 4px 0 rgba(0,0,0,0.5);">ver todas las reuniones &#9656;</button>' +
+          bloqueHorario() +
         '</aside>' +
       '</div>' +
     '</div>';
 
     pintarMes();
-    $('verReuniones').addEventListener('click', openMeetingList);
-  }
-
-  function openMeetingList() {
-    var pendientes = meetings.filter(function (r) { return !r.planned; }).length;
-    var rows = meetings.map(function (r, i) {
-      var color = r.planned ? '#4fd6a0' : '#5c7a86';
-      return '' +
-      '<button class="arcrow" data-meet="' + i + '" style="cursor:pointer; text-align:left; width:100%; display:flex; align-items:center; gap:14px; flex-wrap:wrap; background:#070f18; border:2px solid #173241; border-left:6px solid ' + color + '; box-shadow:4px 4px 0 rgba(0,0,0,0.5); padding:14px 16px; transition:transform .1s, box-shadow .1s;">' +
-        '<span style="font-family:\'JetBrains Mono\',monospace; font-size:11px; font-weight:700; color:#050a0e; background:' + color + '; padding:3px 9px; white-space:nowrap;">' + esc(fechaCorta(r.date)) + '</span>' +
-        '<span style="flex:1 1 220px; min-width:0; font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:17px; color:' + (r.planned ? '#fff' : '#9fc4cd') + ';">' + esc(r.planned ? r.title : 'Tema por definir') + '</span>' +
-        '<span style="font-family:\'JetBrains Mono\',monospace; font-size:12px; color:#5c7a86; white-space:nowrap;">' + esc(DIAS[wdIdx(r.date)]) + '</span>' +
-        '<span style="font-family:\'JetBrains Mono\',monospace; font-size:13px; font-weight:700; color:' + color + '; white-space:nowrap;">abrir &#9656;</span>' +
-      '</button>';
-    }).join('');
-
-    openOverlay('#29c5d6', 'aperture@lab:~$ ls ./reuniones/', '760px',
-      '<h3 style="font-family:\'Press Start 2P\'; font-size:clamp(13px,2.4vw,18px); color:#29c5d6; margin:0 0 6px;">REUNIONES</h3>' +
-      '<p style="font-size:20px; color:#7fa2ac; margin:0 0 18px; font-family:\'VT323\',monospace;">' +
-        meetings.length + ' ' + DIAS[MEET_WD] + 's dentro de la época de clases · ' + pendientes + ' con el tema todavía por definir.</p>' +
-      '<div style="display:flex; flex-direction:column; gap:12px;">' + rows + '</div>');
-
-    Array.prototype.forEach.call(document.querySelectorAll('.arcrow'), function (r) {
-      r.addEventListener('click', function () { openMeeting(parseInt(r.getAttribute('data-meet'), 10)); });
+    Array.prototype.forEach.call(mount.querySelectorAll('.filareu'), function (b) {
+      b.addEventListener('click', function () { openMeeting(parseInt(b.getAttribute('data-meet'), 10)); });
     });
   }
 
@@ -523,13 +538,20 @@
         '<span style="font-family:\'JetBrains Mono\',monospace; font-size:12px; color:' + color + '; border:1px solid ' + color + '; padding:2px 8px;">' + esc(r.iso) + '</span>' +
       '</div>' +
       '<div style="font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:clamp(19px,3vw,25px); color:#fff; line-height:1.25; margin-bottom:6px;">' + esc(r.planned ? r.title : (cal.meetingTitle || 'Reunión del semillero')) + '</div>' +
-      '<div style="font-family:\'JetBrains Mono\',monospace; font-size:14px; color:#9fc4cd; margin-bottom:18px;">' + esc(fechaLarga(r.date)) + '</div>' +
+      (r.speaker ? '<div style="font-family:\'JetBrains Mono\',monospace; font-size:15px; color:' + color + '; margin-bottom:8px;">por ' + esc(r.speaker) + '</div>' : '') +
+      '<div style="font-family:\'JetBrains Mono\',monospace; font-size:14px; color:#9fc4cd; margin-bottom:' + (cal.meetingTime || cal.meetingPlace ? '10px' : '18px') + ';">' + esc(fechaLarga(r.date)) + '</div>' +
+      (cal.meetingTime || cal.meetingPlace
+        ? '<div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;">' +
+            (cal.meetingTime ? '<span style="font-family:\'JetBrains Mono\',monospace; font-size:13px; font-weight:700; color:#4fd6a0; border:1px solid #1f6f7c; background:#0a1622; padding:4px 10px;">' + esc(cal.meetingTime) + '</span>' : '') +
+            (cal.meetingPlace ? '<span style="font-family:\'JetBrains Mono\',monospace; font-size:13px; font-weight:700; color:#29c5d6; border:1px solid #1f6f7c; background:#0a1622; padding:4px 10px;">' + esc(cal.meetingPlace) + '</span>' : '') +
+          '</div>'
+        : '') +
       (r.planned ? '' :
         '<div style="display:flex; gap:12px; align-items:flex-start; background:#070f18; border:2px solid #f5b94d; border-left:6px solid #f5b94d; padding:14px 16px; margin-bottom:18px;">' +
           '<span style="font-family:\'Press Start 2P\'; font-size:12px; color:#f5b94d; line-height:1.2;">?</span>' +
           '<span style="font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:15px; color:#f5b94d;">Tema por definir</span>' +
         '</div>') +
-      '<p style="font-size:22px; line-height:1.45; color:#cfe8ec; margin:0; font-family:\'VT323\',monospace;">' + esc(r.text) + '</p>';
+      (r.text ? '<p style="font-size:22px; line-height:1.45; color:#cfe8ec; margin:0; font-family:\'VT323\',monospace;">' + esc(r.text) + '</p>' : '');
 
     openOverlay(color, 'aperture@lab:~$ cat ./reuniones/' + r.iso + '.md', '640px', cuerpo);
   }

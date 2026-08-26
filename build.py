@@ -76,14 +76,17 @@ def build_calendar():
     return {
         "title": C.CALENDARIO_TITULO,
         "text": C.CALENDARIO_TEXTO,
-        "start": C.CLASES_INICIO,
-        "end": C.CLASES_FIN,
+        "start": C.REUNION_INICIO,
+        "end": C.REUNION_FIN,
         "meetingWeekday": C.REUNION_DIA,
         "meetingTitle": C.REUNION_TITULO,
-        "meetingNote": C.REUNION_NOTA,
+        "meetingPlace": C.REUNION_LUGAR,
+        "meetingTime": C.REUNION_HORA,
         "meetings": {
-            f: {"title": t, "text": x} for f, (t, x) in C.REUNIONES.items()
+            f: {"title": t, "speaker": q, "text": x} for f, (t, q, x) in C.REUNIONES.items()
         },
+        "holidays": {f: {"label": lbl} for f, lbl in C.FESTIVOS.items()},
+        "skipped": {f: {"label": lbl} for f, lbl in C.SIN_REUNION.items()},
         "milestones": {
             f: {"label": lbl, "accent": hexof(col)} for f, (lbl, col) in C.HITOS.items()
         },
