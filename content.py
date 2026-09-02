@@ -172,13 +172,30 @@ REUNION_HORA   = "4:00 – 6:00 p. m."
 
 REUNIONES = {
     # fecha: (título, ponente, de qué va)
-    "2026-09-28": ("Visión Artificial", "Asesor Ágora",
+    "2026-09-07": ("Cuando la IA se convierte en el motor de transformación de una empresa",
+                   "Juan Carlos González",
+                   "Qué cambia dentro de una organización cuando la IA deja de ser un "
+                   "experimento y pasa a mover el negocio."),
+    "2026-09-14": ("¿Cómo funcionan las redes neuronales?", "Jerónimo Hoyos",
+                   "Qué hay debajo de una red neuronal. De la neurona artificial al "
+                   "entrenamiento que la hace aprender."),
+    "2026-09-21": ("Introducción a la Regresión", "Valentina Muñoz",
+                   "El modelo con el que todo empieza. Cómo trazar la relación entre "
+                   "variables y usarla para predecir."),
+    "2026-09-28": ("Visión Artificial", "Nicolás Mesa Ortega",
                    "Cómo una máquina aprende a ver. De los píxeles crudos al modelo "
                    "que reconoce lo que hay dentro de una imagen."),
+    "2026-10-05": ("Introducción a los sistemas RAG", "Esteban López Aguirre",
+                   "Cómo darle a un modelo de lenguaje una fuente de verdad. Recuperar, "
+                   "dar contexto y responder sin inventar."),
+    "2026-10-19": ("Detectives de bases de datos: una muy breve introducción a SQL",
+                   "Ronald Hernández",
+                   "Preguntarle cosas a una base de datos y que responda. Las consultas "
+                   "mínimas para encontrar lo que está escondido entre las tablas."),
     "2026-10-26": ("Análisis Topológico de Datos", "Carlos Reza",
                    "La forma de los datos también dice cosas. Cómo la topología "
                    "encuentra estructura donde la estadística clásica no llega."),
-    "2026-11-09": ("Data Science con Fórmula 1", "Jose Miguel García",
+    "2026-11-09": ("El Circuito de la Ciencia de Datos en F1", "Jose Miguel García",
                    "Telemetría, estrategia de pits y ritmo de carrera. Qué tanto se "
                    "puede predecir con los datos que deja cada vuelta."),
 }
