@@ -241,7 +241,7 @@ window.APERTURE_DATA = {
         "text": "Preguntarle cosas a una base de datos y que responda. Las consultas mínimas para encontrar lo que está escondido entre las tablas."
       },
       "2026-10-26": {
-        "title": "Análisis Topológico de Datos",
+        "title": "Topología aplicada al análisis de datos",
         "speaker": "Carlos Reza",
         "text": "La forma de los datos también dice cosas. Cómo la topología encuentra estructura donde la estadística clásica no llega."
       },

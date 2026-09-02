@@ -192,7 +192,7 @@ REUNIONES = {
                    "Ronald Hernández",
                    "Preguntarle cosas a una base de datos y que responda. Las consultas "
                    "mínimas para encontrar lo que está escondido entre las tablas."),
-    "2026-10-26": ("Análisis Topológico de Datos", "Carlos Reza",
+    "2026-10-26": ("Topología aplicada al análisis de datos", "Carlos Reza",
                    "La forma de los datos también dice cosas. Cómo la topología "
                    "encuentra estructura donde la estadística clásica no llega."),
     "2026-11-09": ("El Circuito de la Ciencia de Datos en F1", "Jose Miguel García",
