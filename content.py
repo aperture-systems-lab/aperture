@@ -198,6 +198,9 @@ REUNIONES = {
     "2026-11-09": ("El Circuito de la Ciencia de Datos en F1", "Jose Miguel García",
                    "Telemetría, estrategia de pits y ritmo de carrera. Qué tanto se "
                    "puede predecir con los datos que deja cada vuelta."),
+    "2026-11-23": ("Muestra de proyectos", "",
+                   "Cierre del semestre. Cada equipo presenta lo que construyó: qué "
+                   "problema atacó, cómo lo resolvió y qué sigue."),
 }
 
 FESTIVOS = {

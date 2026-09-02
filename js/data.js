@@ -249,6 +249,11 @@ window.APERTURE_DATA = {
         "title": "El Circuito de la Ciencia de Datos en F1",
         "speaker": "Jose Miguel García",
         "text": "Telemetría, estrategia de pits y ritmo de carrera. Qué tanto se puede predecir con los datos que deja cada vuelta."
+      },
+      "2026-11-23": {
+        "title": "Muestra de proyectos",
+        "speaker": "",
+        "text": "Cierre del semestre. Cada equipo presenta lo que construyó: qué problema atacó, cómo lo resolvió y qué sigue."
       }
     },
     "holidays": {
