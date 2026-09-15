@@ -72,6 +72,18 @@ def build_projects():
         })
     return out
 
+def build_meeting(fecha, titulo, ponente, texto):
+    d = getattr(C, "DETALLES", {}).get(fecha, {})
+    return {
+        "title": titulo,
+        "speaker": ponente,
+        "text": texto,
+        "flyer": d.get("afiche", ""),
+        "time": d.get("hora", ""),
+        "place": d.get("lugar", ""),
+        "link": d.get("enlace", ""),
+    }
+
 def build_calendar():
     return {
         "title": C.CALENDARIO_TITULO,
@@ -83,7 +95,7 @@ def build_calendar():
         "meetingPlace": C.REUNION_LUGAR,
         "meetingTime": C.REUNION_HORA,
         "meetings": {
-            f: {"title": t, "speaker": q, "text": x} for f, (t, q, x) in C.REUNIONES.items()
+            f: build_meeting(f, t, q, x) for f, (t, q, x) in C.REUNIONES.items()
         },
         "holidays": {f: {"label": lbl} for f, lbl in C.FESTIVOS.items()},
         "skipped": {f: {"label": lbl} for f, lbl in C.SIN_REUNION.items()},

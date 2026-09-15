@@ -65,24 +65,31 @@
   var SIN_REUNION = cal.skipped || {};
 
   var meetings = (function () {
-    var out = [], d, extra, iso;
+    var out = [], d, info, iso, habitual;
     if (!CAL_START || !CAL_END) return out;
     for (d = new Date(CAL_START); d <= CAL_END; d.setDate(d.getDate() + 1)) {
-      if (wdIdx(d) !== MEET_WD) continue;
       iso = toISO(d);
-      if (FESTIVOS[iso] || SIN_REUNION[iso]) continue;
-      extra = (cal.meetings || {})[iso];
+      info = (cal.meetings || {})[iso];
+      habitual = wdIdx(d) === MEET_WD && !FESTIVOS[iso] && !SIN_REUNION[iso];
+      if (!habitual && !(info && info.title)) continue;
       out.push({
         iso: iso,
         date: new Date(d),
-        title: extra && extra.title ? extra.title : (cal.meetingTitle || 'Reunión del semillero'),
-        speaker: extra && extra.speaker ? extra.speaker : '',
-        text: extra && extra.text ? extra.text : '',
-        planned: !!(extra && extra.title)
+        title: info && info.title ? info.title : (cal.meetingTitle || 'Reunión del semillero'),
+        speaker: info && info.speaker ? info.speaker : '',
+        text: info && info.text ? info.text : '',
+        flyer: info && info.flyer ? info.flyer : '',
+        link: info && info.link ? info.link : '',
+        time: info && info.time ? info.time : (cal.meetingTime || ''),
+        place: info && info.place ? info.place : (cal.meetingPlace || ''),
+        aparte: !habitual,
+        planned: !!(info && info.title)
       });
     }
     return out;
   })();
+
+  function colorMeet(r) { return r.aparte ? '#29c5d6' : '#4fd6a0'; }
 
   var meetIdx = (function () {
     var m = {};
@@ -104,11 +111,12 @@
     var mi = meetIdx[iso];
     var hito = HITOS[iso];
     var esReunion = mi != null;
+    var cReu = esReunion ? colorMeet(meetings[mi]) : '';
 
     var fg = '#7fa2ac', bg = 'transparent', bd = '1px solid transparent', extra = '';
     if (esReunion) {
-      fg = '#4fd6a0'; bg = '#082019'; bd = '2px solid #4fd6a0';
-      extra = 'box-shadow:0 0 10px rgba(79,214,160,0.22); font-weight:700;';
+      fg = cReu; bg = meetings[mi].aparte ? '#06202a' : '#082019'; bd = '2px solid ' + cReu;
+      extra = 'box-shadow:0 0 10px ' + glowFor(cReu) + '; font-weight:700;';
     }
     if (hito) {
       fg = hito.accent; bd = '2px solid ' + hito.accent;
@@ -121,11 +129,11 @@
       '; border:' + bd + '; ' + extra;
 
     var punto = esReunion
-      ? '<i style="position:absolute; bottom:5px; left:50%; transform:translateX(-50%); width:5px; height:5px; background:' + (hito ? hito.accent : '#4fd6a0') + '; border-radius:50%;"></i>'
+      ? '<i style="position:absolute; bottom:5px; left:50%; transform:translateX(-50%); width:5px; height:5px; background:' + (hito ? hito.accent : cReu) + '; border-radius:50%;"></i>'
       : '';
 
     if (esReunion) {
-      return '<button class="calcell calday" data-meet="' + mi + '" title="' + esc(cal.meetingTitle || 'Reunión') + ' · ' + esc(fechaLarga(d)) + '" ' +
+      return '<button class="calcell calday" data-meet="' + mi + '" title="' + esc(meetings[mi].title) + ' · ' + esc(fechaLarga(d)) + '" ' +
         'style="cursor:pointer; transition:transform .1s, box-shadow .1s; ' + style + '">' + d.getDate() + punto + '</button>';
     }
 
@@ -215,13 +223,14 @@
   }
 
   function filaReunion(r, i) {
-    var color = r.planned ? '#4fd6a0' : '#5c7a86';
-    var fondo = r.planned ? '#082019' : 'transparent';
+    var color = r.planned ? colorMeet(r) : '#5c7a86';
+    var icono = '#29c5d6';
+    var fondo = r.planned ? '#06202a' : 'transparent';
     return '' +
     '<button class="filareu" data-meet="' + i + '" title="' + esc(fechaLarga(r.date)) + '" ' +
       'style="cursor:pointer; text-align:left; width:100%; background:transparent; border:none; padding:2px 0; margin:-2px 0; ' +
       'display:flex; align-items:flex-start; gap:8px; font-family:\'JetBrains Mono\',monospace; font-size:13px; line-height:1.35; color:#9fc4cd; transition:transform .1s, color .1s;">' +
-      '<span style="flex:none; width:17px; height:17px; display:grid; place-items:center; font-size:9px; color:' + color + '; border:2px solid ' + color + '; background:' + fondo + ';">&#9679;</span>' +
+      '<span style="flex:none; width:17px; height:17px; display:grid; place-items:center; font-size:9px; color:' + icono + '; border:2px solid ' + icono + '; background:' + fondo + ';">&#9679;</span>' +
       '<span style="min-width:0;">' +
         '<b style="color:' + color + ';">' + esc(fechaCorta(r.date)) + '</b> · ' +
         esc(r.planned ? r.title : 'sin programar') +
@@ -525,35 +534,99 @@
     $('ovCard').addEventListener('click', function (e) { e.stopPropagation(); });
     $('ovClose').addEventListener('click', closeModal);
   }
-  function closeModal() { $('modalMount').innerHTML = ''; }
+  function closeZoom() {
+    var z = $('zoomBack');
+    if (!z) return false;
+    z.parentNode.removeChild(z);
+    return true;
+  }
+
+  function openZoom(src, titulo, color) {
+    closeZoom();
+    var capa = document.createElement('div');
+    capa.id = 'zoomBack';
+    capa.style.cssText = 'position:fixed; inset:0; z-index:210; background:rgba(3,7,12,0.95); ' +
+      'display:flex; align-items:center; justify-content:center; padding:26px 16px; overflow:auto; cursor:zoom-out;';
+    capa.innerHTML = '' +
+      '<button id="zoomClose" aria-label="cerrar" style="position:fixed; top:16px; right:16px; z-index:1; cursor:pointer; background:#0a1622; border:2px solid ' + color + '; color:' + color + '; font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:13px; padding:5px 11px;">[ x ]</button>' +
+      '<img id="zoomImg" src="' + esc(src) + '" alt="Afiche de la charla: ' + esc(titulo) + '" ' +
+        'style="display:block; max-width:min(100%,780px); max-height:90vh; width:auto; margin:auto; ' +
+        'border:3px solid ' + color + '; box-shadow:0 0 42px ' + glowFor(color) + '; cursor:zoom-in;" />';
+    document.body.appendChild(capa);
+
+    var img = $('zoomImg'), ampliada = false;
+    capa.addEventListener('click', closeZoom);
+    $('zoomClose').addEventListener('click', function (e) { e.stopPropagation(); closeZoom(); });
+    img.addEventListener('click', function (e) {
+      e.stopPropagation();
+      ampliada = !ampliada;
+      if (ampliada) {
+        img.style.maxWidth = 'none';
+        img.style.maxHeight = 'none';
+        img.style.width = (img.naturalWidth || 1080) + 'px';
+        img.style.cursor = 'zoom-out';
+        capa.style.alignItems = 'flex-start';
+      } else {
+        img.style.maxWidth = 'min(100%,780px)';
+        img.style.maxHeight = '90vh';
+        img.style.width = 'auto';
+        img.style.cursor = 'zoom-in';
+        capa.style.alignItems = 'center';
+        capa.scrollTop = 0;
+      }
+    });
+  }
+
+  function closeModal() {
+    if (closeZoom()) return;
+    $('modalMount').innerHTML = '';
+  }
 
   function openMeeting(i) {
     var r = meetings[i];
     if (!r) return;
-    var color = r.planned ? '#4fd6a0' : '#f5b94d';
+    var color = r.planned ? colorMeet(r) : '#f5b94d';
 
     var cuerpo = '' +
       '<div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:16px;">' +
-        '<span style="font-family:\'JetBrains Mono\',monospace; font-size:12px; font-weight:700; color:#050a0e; background:' + color + '; padding:3px 9px;">REUNIÓN</span>' +
+        '<span style="font-family:\'JetBrains Mono\',monospace; font-size:12px; font-weight:700; color:#050a0e; background:' + color + '; padding:3px 9px;">' + (r.aparte ? 'SESIÓN EXTRA' : 'REUNIÓN') + '</span>' +
         '<span style="font-family:\'JetBrains Mono\',monospace; font-size:12px; color:' + color + '; border:1px solid ' + color + '; padding:2px 8px;">' + esc(r.iso) + '</span>' +
+        (r.link ? '<span style="font-family:\'JetBrains Mono\',monospace; font-size:12px; font-weight:700; color:#050a0e; background:#cfe8ec; padding:3px 9px;">VIRTUAL</span>' : '') +
       '</div>' +
       '<div style="font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:clamp(19px,3vw,25px); color:#fff; line-height:1.25; margin-bottom:6px;">' + esc(r.planned ? r.title : (cal.meetingTitle || 'Reunión del semillero')) + '</div>' +
       (r.speaker ? '<div style="font-family:\'JetBrains Mono\',monospace; font-size:15px; color:' + color + '; margin-bottom:8px;">por ' + esc(r.speaker) + '</div>' : '') +
-      '<div style="font-family:\'JetBrains Mono\',monospace; font-size:14px; color:#9fc4cd; margin-bottom:' + (cal.meetingTime || cal.meetingPlace ? '10px' : '18px') + ';">' + esc(fechaLarga(r.date)) + '</div>' +
-      (cal.meetingTime || cal.meetingPlace
+      '<div style="font-family:\'JetBrains Mono\',monospace; font-size:14px; color:#9fc4cd; margin-bottom:' + (r.time || r.place ? '10px' : '18px') + ';">' + esc(fechaLarga(r.date)) + '</div>' +
+      (r.time || r.place
         ? '<div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;">' +
-            (cal.meetingTime ? '<span style="font-family:\'JetBrains Mono\',monospace; font-size:13px; font-weight:700; color:#4fd6a0; border:1px solid #1f6f7c; background:#0a1622; padding:4px 10px;">' + esc(cal.meetingTime) + '</span>' : '') +
-            (cal.meetingPlace ? '<span style="font-family:\'JetBrains Mono\',monospace; font-size:13px; font-weight:700; color:#29c5d6; border:1px solid #1f6f7c; background:#0a1622; padding:4px 10px;">' + esc(cal.meetingPlace) + '</span>' : '') +
+            (r.time ? '<span style="font-family:\'JetBrains Mono\',monospace; font-size:13px; font-weight:700; color:#4fd6a0; border:1px solid #1f6f7c; background:#0a1622; padding:4px 10px;">' + esc(r.time) + '</span>' : '') +
+            (r.place ? '<span style="font-family:\'JetBrains Mono\',monospace; font-size:13px; font-weight:700; color:#29c5d6; border:1px solid #1f6f7c; background:#0a1622; padding:4px 10px;">' + esc(r.place) + '</span>' : '') +
           '</div>'
+        : '') +
+      (r.link
+        ? '<a class="pjlink" href="' + esc(r.link) + '" target="_blank" rel="noopener" style="--glow:' + glowFor(color) + '; display:inline-flex; align-items:center; gap:9px; text-decoration:none; font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:14px; color:#050a0e; background:' + color + '; border:2px solid ' + color + '; box-shadow:4px 4px 0 rgba(0,0,0,0.5); padding:9px 14px; margin-bottom:18px; transition:transform .1s, box-shadow .1s;">entrar a la reunión &#9656;</a>'
         : '') +
       (r.planned ? '' :
         '<div style="display:flex; gap:12px; align-items:flex-start; background:#070f18; border:2px solid #f5b94d; border-left:6px solid #f5b94d; padding:14px 16px; margin-bottom:18px;">' +
           '<span style="font-family:\'Press Start 2P\'; font-size:12px; color:#f5b94d; line-height:1.2;">?</span>' +
           '<span style="font-family:\'JetBrains Mono\',monospace; font-weight:700; font-size:15px; color:#f5b94d;">Tema por definir</span>' +
         '</div>') +
-      (r.text ? '<p style="font-size:22px; line-height:1.45; color:#cfe8ec; margin:0; font-family:\'VT323\',monospace;">' + esc(r.text) + '</p>' : '');
+      (r.text ? '<p style="font-size:22px; line-height:1.45; color:#cfe8ec; margin:0; font-family:\'VT323\',monospace;">' + esc(r.text) + '</p>' : '') +
+      (r.flyer
+        ? '<button class="afiche" type="button" style="--glow:' + glowFor(color) + '; display:block; width:100%; text-align:left; font:inherit; cursor:zoom-in; background:#070f18; border:2px solid #173241; border-top:4px solid ' + color + '; box-shadow:6px 6px 0 rgba(0,0,0,0.5); padding:12px; margin-top:20px; transition:transform .1s, box-shadow .1s;">' +
+            '<span style="display:flex; align-items:center; justify-content:space-between; gap:10px; font-family:\'JetBrains Mono\',monospace; font-size:11px; letter-spacing:0.6px; text-transform:uppercase; color:#5c7a86; margin-bottom:10px;">' +
+              '<span>afiche de la charla</span>' +
+              '<span style="color:' + color + ';">[ ampliar ]</span>' +
+            '</span>' +
+            '<img src="' + esc(r.flyer) + '" alt="Afiche de la charla: ' + esc(r.title) + '" loading="lazy" style="display:block; width:100%; max-width:390px; margin:0 auto; border:2px solid #173241;" />' +
+          '</button>'
+        : '');
 
     openOverlay(color, 'aperture@lab:~$ cat ./reuniones/' + r.iso + '.md', '640px', cuerpo);
+
+    var afiche = $('modalMount').querySelector('.afiche');
+    if (afiche) {
+      afiche.addEventListener('click', function () { openZoom(r.flyer, r.title, color); });
+    }
   }
 
   function openLine(key) {

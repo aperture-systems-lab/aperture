@@ -179,6 +179,10 @@ REUNIONES = {
     "2026-09-14": ("¿Cómo funcionan las redes neuronales?", "Jerónimo Hoyos",
                    "Qué hay debajo de una red neuronal. De la neurona artificial al "
                    "entrenamiento que la hace aprender."),
+    "2026-09-18": ("Introducción a Git y GitHub", "Jerónimo Hoyos",
+                   "Control de versiones desde cero. Cómo guardar la historia de tu "
+                   "código, volver atrás cuando algo se rompe y trabajar con otros sin "
+                   "pisarse el trabajo."),
     "2026-09-21": ("Introducción a la Regresión", "Valentina Muñoz",
                    "El modelo con el que todo empieza. Cómo trazar la relación entre "
                    "variables y usarla para predecir."),
@@ -201,6 +205,18 @@ REUNIONES = {
     "2026-11-23": ("Muestra de proyectos", "",
                    "Cierre del semestre. Cada equipo presenta lo que construyó: qué "
                    "problema atacó, cómo lo resolvió y qué sigue."),
+}
+
+# Detalles opcionales de cada reunión. Una fecha que no caiga en el día habitual
+# (REUNION_DIA) se agrega al calendario como sesión extra.
+# fecha: {"afiche", "hora", "lugar", "enlace"}
+DETALLES = {
+    "2026-09-07": {"afiche": "assets/afiches/2026-09-07.webp"},
+    "2026-09-14": {"afiche": "assets/afiches/2026-09-14.webp"},
+    "2026-09-18": {"afiche": "assets/afiches/2026-09-18.webp",
+                   "hora":   "6:00 p. m.",
+                   "lugar":  "Reunión virtual",
+                   "enlace": "https://meet.google.com/hui-pkwe-boi"},
 }
 
 FESTIVOS = {

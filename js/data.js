@@ -213,47 +213,92 @@ window.APERTURE_DATA = {
       "2026-09-07": {
         "title": "Cuando la IA se convierte en el motor de transformación de una empresa",
         "speaker": "Juan Carlos González",
-        "text": "Qué cambia dentro de una organización cuando la IA deja de ser un experimento y pasa a mover el negocio."
+        "text": "Qué cambia dentro de una organización cuando la IA deja de ser un experimento y pasa a mover el negocio.",
+        "flyer": "assets/afiches/2026-09-07.webp",
+        "time": "",
+        "place": "",
+        "link": ""
       },
       "2026-09-14": {
         "title": "¿Cómo funcionan las redes neuronales?",
         "speaker": "Jerónimo Hoyos",
-        "text": "Qué hay debajo de una red neuronal. De la neurona artificial al entrenamiento que la hace aprender."
+        "text": "Qué hay debajo de una red neuronal. De la neurona artificial al entrenamiento que la hace aprender.",
+        "flyer": "assets/afiches/2026-09-14.webp",
+        "time": "",
+        "place": "",
+        "link": ""
+      },
+      "2026-09-18": {
+        "title": "Introducción a Git y GitHub",
+        "speaker": "Jerónimo Hoyos",
+        "text": "Control de versiones desde cero. Cómo guardar la historia de tu código, volver atrás cuando algo se rompe y trabajar con otros sin pisarse el trabajo.",
+        "flyer": "assets/afiches/2026-09-18.webp",
+        "time": "6:00 p. m.",
+        "place": "Reunión virtual",
+        "link": "https://meet.google.com/hui-pkwe-boi"
       },
       "2026-09-21": {
         "title": "Introducción a la Regresión",
         "speaker": "Valentina Muñoz",
-        "text": "El modelo con el que todo empieza. Cómo trazar la relación entre variables y usarla para predecir."
+        "text": "El modelo con el que todo empieza. Cómo trazar la relación entre variables y usarla para predecir.",
+        "flyer": "",
+        "time": "",
+        "place": "",
+        "link": ""
       },
       "2026-09-28": {
         "title": "Visión Artificial",
         "speaker": "Nicolás Mesa Ortega",
-        "text": "Cómo una máquina aprende a ver. De los píxeles crudos al modelo que reconoce lo que hay dentro de una imagen."
+        "text": "Cómo una máquina aprende a ver. De los píxeles crudos al modelo que reconoce lo que hay dentro de una imagen.",
+        "flyer": "",
+        "time": "",
+        "place": "",
+        "link": ""
       },
       "2026-10-05": {
         "title": "Introducción a los sistemas RAG",
         "speaker": "Esteban López Aguirre",
-        "text": "Cómo darle a un modelo de lenguaje una fuente de verdad. Recuperar, dar contexto y responder sin inventar."
+        "text": "Cómo darle a un modelo de lenguaje una fuente de verdad. Recuperar, dar contexto y responder sin inventar.",
+        "flyer": "",
+        "time": "",
+        "place": "",
+        "link": ""
       },
       "2026-10-19": {
         "title": "Detectives de bases de datos: una muy breve introducción a SQL",
         "speaker": "Ronald Hernández",
-        "text": "Preguntarle cosas a una base de datos y que responda. Las consultas mínimas para encontrar lo que está escondido entre las tablas."
+        "text": "Preguntarle cosas a una base de datos y que responda. Las consultas mínimas para encontrar lo que está escondido entre las tablas.",
+        "flyer": "",
+        "time": "",
+        "place": "",
+        "link": ""
       },
       "2026-10-26": {
         "title": "Topología aplicada al análisis de datos",
         "speaker": "Carlos Reza",
-        "text": "La forma de los datos también dice cosas. Cómo la topología encuentra estructura donde la estadística clásica no llega."
+        "text": "La forma de los datos también dice cosas. Cómo la topología encuentra estructura donde la estadística clásica no llega.",
+        "flyer": "",
+        "time": "",
+        "place": "",
+        "link": ""
       },
       "2026-11-09": {
         "title": "El Circuito de la Ciencia de Datos en F1",
         "speaker": "Jose Miguel García",
-        "text": "Telemetría, estrategia de pits y ritmo de carrera. Qué tanto se puede predecir con los datos que deja cada vuelta."
+        "text": "Telemetría, estrategia de pits y ritmo de carrera. Qué tanto se puede predecir con los datos que deja cada vuelta.",
+        "flyer": "",
+        "time": "",
+        "place": "",
+        "link": ""
       },
       "2026-11-23": {
         "title": "Muestra de proyectos",
         "speaker": "",
-        "text": "Cierre del semestre. Cada equipo presenta lo que construyó: qué problema atacó, cómo lo resolvió y qué sigue."
+        "text": "Cierre del semestre. Cada equipo presenta lo que construyó: qué problema atacó, cómo lo resolvió y qué sigue.",
+        "flyer": "",
+        "time": "",
+        "place": "",
+        "link": ""
       }
     },
     "holidays": {

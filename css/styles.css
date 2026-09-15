@@ -34,6 +34,7 @@ html, body, * { scrollbar-width: none; -ms-overflow-style: none; }
 .pjaccess:hover { background:#0c1c26 !important; }
 .pjaccess:hover .pjbtn { transform:translateY(-3px); box-shadow:4px 7px 0 #12525c, 0 0 22px rgba(41,197,214,0.5); }
 .volver:hover { transform:translateY(-3px); border-color:#29c5d6 !important; box-shadow:4px 7px 0 rgba(0,0,0,0.5), 0 0 20px rgba(41,197,214,0.35) !important; }
+.afiche:hover { transform:translateY(-3px); box-shadow:6px 10px 0 rgba(0,0,0,0.5), 0 0 22px var(--glow) !important; }
 .calday:hover { transform:translateY(-2px); box-shadow:0 0 16px rgba(79,214,160,0.5) !important; }
 
 .videoframe { position:relative; width:100%; aspect-ratio:16 / 9; }
