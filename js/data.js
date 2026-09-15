@@ -283,9 +283,9 @@ window.APERTURE_DATA = {
         "link": ""
       },
       "2026-11-09": {
-        "title": "El Circuito de la Ciencia de Datos en F1",
+        "title": "Monte Carlo, de la bomba atómica a las finanzas cuantitativas",
         "speaker": "Jose Miguel García",
-        "text": "Telemetría, estrategia de pits y ritmo de carrera. Qué tanto se puede predecir con los datos que deja cada vuelta.",
+        "text": "Simular miles de veces lo que no se puede calcular. El método que nació en el Proyecto Manhattan y hoy le pone número al riesgo en los mercados.",
         "flyer": "",
         "time": "",
         "place": "",

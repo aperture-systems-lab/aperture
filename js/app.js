@@ -224,13 +224,12 @@
 
   function filaReunion(r, i) {
     var color = r.planned ? colorMeet(r) : '#5c7a86';
-    var icono = '#29c5d6';
-    var fondo = r.planned ? '#06202a' : 'transparent';
+    var fondo = r.planned ? (r.aparte ? '#06202a' : '#082019') : 'transparent';
     return '' +
     '<button class="filareu" data-meet="' + i + '" title="' + esc(fechaLarga(r.date)) + '" ' +
       'style="cursor:pointer; text-align:left; width:100%; background:transparent; border:none; padding:2px 0; margin:-2px 0; ' +
       'display:flex; align-items:flex-start; gap:8px; font-family:\'JetBrains Mono\',monospace; font-size:13px; line-height:1.35; color:#9fc4cd; transition:transform .1s, color .1s;">' +
-      '<span style="flex:none; width:17px; height:17px; display:grid; place-items:center; font-size:9px; color:' + icono + '; border:2px solid ' + icono + '; background:' + fondo + ';">&#9679;</span>' +
+      '<span style="flex:none; width:17px; height:17px; display:grid; place-items:center; font-size:9px; color:' + color + '; border:2px solid ' + color + '; background:' + fondo + ';">&#9679;</span>' +
       '<span style="min-width:0;">' +
         '<b style="color:' + color + ';">' + esc(fechaCorta(r.date)) + '</b> · ' +
         esc(r.planned ? r.title : 'sin programar') +

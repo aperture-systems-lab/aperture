@@ -199,9 +199,11 @@ REUNIONES = {
     "2026-10-26": ("Topología aplicada al análisis de datos", "Carlos Reza",
                    "La forma de los datos también dice cosas. Cómo la topología "
                    "encuentra estructura donde la estadística clásica no llega."),
-    "2026-11-09": ("El Circuito de la Ciencia de Datos en F1", "Jose Miguel García",
-                   "Telemetría, estrategia de pits y ritmo de carrera. Qué tanto se "
-                   "puede predecir con los datos que deja cada vuelta."),
+    "2026-11-09": ("Monte Carlo, de la bomba atómica a las finanzas cuantitativas",
+                   "Jose Miguel García",
+                   "Simular miles de veces lo que no se puede calcular. El método que "
+                   "nació en el Proyecto Manhattan y hoy le pone número al riesgo en "
+                   "los mercados."),
     "2026-11-23": ("Muestra de proyectos", "",
                    "Cierre del semestre. Cada equipo presenta lo que construyó: qué "
                    "problema atacó, cómo lo resolvió y qué sigue."),
